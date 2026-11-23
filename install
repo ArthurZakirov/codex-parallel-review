@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""Install and verify this checkout in the current Codex configuration."""
+import argparse
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+
+def main() -> None:
+    checkout = Path(__file__).resolve().parent
+    if sys.version_info < (3, 10):
+        sys.exit("Use Python 3.10 or newer to run ./install.")
+    parser = argparse.ArgumentParser(description="Install parallel-review into Codex.")
+    parser.add_argument("plugin", choices=["parallel-review"], nargs="?")
+    parser.parse_args()
+
+    subprocess.run(["codex", "login", "status"], check=True)
+    _register_marketplace(checkout)
+    installed = _install_plugin(checkout, "parallel-review")
+    print(f"Ready: parallel-review at {installed}")
+
+
+def _install_plugin(checkout: Path, name: str) -> Path:
+    result = subprocess.check_output(["codex", "plugin", "add", f"{name}@codex-parallel-review", "--json"])
+    installed = Path(json.loads(result)["installedPath"])
+    package = checkout / "src" / name
+    for source in package.rglob("*"):
+        if source.is_file() and "__pycache__" not in source.parts:
+            copied = installed / source.relative_to(package)
+            if not copied.is_file() or copied.read_bytes() != source.read_bytes():
+                sys.exit(f"Installed plugin differs from checkout at {source.relative_to(package)}.")
+    return installed
+
+
+def _register_marketplace(checkout: Path) -> None:
+    add = ["codex", "plugin", "marketplace", "add", str(checkout)]
+    result = subprocess.run(add, stderr=subprocess.PIPE, text=True)
+    if result.returncode == 0:
+        return
+
+    conflict = "marketplace 'codex-parallel-review' is already added from a different source"
+    if conflict not in result.stderr:
+        sys.exit(result.stderr.strip() or "Codex could not register the codex-parallel-review marketplace.")
+
+    print(f"Updating the codex-parallel-review marketplace source to {checkout}.", flush=True)
+    subprocess.run(["codex", "plugin", "marketplace", "remove", "codex-parallel-review"], check=True)
+    subprocess.run(add, check=True)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except subprocess.CalledProcessError as error:
+        sys.exit(f"{error.cmd[0]} exited with status {error.returncode}.")
