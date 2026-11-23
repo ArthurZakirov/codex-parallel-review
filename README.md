@@ -16,9 +16,9 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 ## How review works
 
-**Code edits.** Native patches go to experience, standards and correctness reviewers.
+**Code edits.** Native and observed shell edits go to experience, standards and correctness reviewers.
 
-**Markdown edits.** Around native patches and shell commands, the hook compares Markdown files in the working directory. For Git workspaces it includes tracked and non-ignored untracked files. A new document goes to both reviewers in full. For an existing document, each receives a diff and the enclosing sections. The submission supplies the writing request when available.
+**Markdown edits.** For shell commands, the hook compares files before and after execution in the tool working directory and literal `cd` destinations. Inside a Git checkout it uses tracked and non-ignored untracked files across the checkout. It also checks explicit file paths in the command. Native patches supply their own edit paths. A new document goes to both reviewers in full. For an existing document, each receives a diff and the enclosing sections. The submission supplies the writing request when available.
 
 | Reviewer | Review question |
 | --- | --- |
@@ -35,7 +35,7 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 With `2`, review-guided edits can trigger one verification pass. Use `0` for no passes or `"unlimited"` to keep reviewing while the worker makes new eligible edits. A stop without new edits costs nothing. A failed reviewer launch consumes the attempted pass. Reports remain separate so the worker can identify which pass requested a fix.
 
-**Capture limits.** Workspace comparisons observe changes during a tool call. Concurrent external edits in the same directory can be included. Background writes after a command returns, MCP writes, ignored untracked files in Git, and writes outside the observed directory can be missed. The hook skips snapshotting the home directory and filesystem root. Native code patches still use their patch evidence.
+**Capture limits.** Workspace comparisons observe changes during a tool call. Concurrent external edits in the same directory can be included. A script that computes a destination in another checkout internally can escape observation. Pass its output path explicitly or run it from the destination checkout. Outside Git, directory snapshots cover immediate files. Background writes after the hook returns and writes through MCP can also escape observation. The hook skips snapshotting the home directory and filesystem root. Native code patches still use their patch evidence.
 
 **Markdown guidance.** Both reviewers receive their own bundled rules with tools disabled. When the local information-representation-design skill is available, the hook includes its structure rules for Reader and its presentation and reference rules for Representation. To supplement both roles, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute path containing additional rules.
 

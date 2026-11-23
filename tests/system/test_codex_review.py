@@ -17,6 +17,7 @@ def review_chat(tmp_path):
     (home / "auth.json").symlink_to(auth)
     workspace = tmp_path / "project"
     workspace.mkdir()
+    (tmp_path / "start").mkdir()
     (workspace / "service.py").write_bytes((ROOT / "tests/fixtures/dispatch_api/service.py").read_bytes())
     subprocess.run(["git", "init", "-q", "-b", "main", "--separate-git-dir", str(tmp_path / "history")], check=True, cwd=workspace)
     env = dict(os.environ, CODEX_HOME=str(home), HOME=str(tmp_path))
@@ -29,7 +30,8 @@ def review_chat(tmp_path):
 
 @when("the user makes a documentation edit", target_fixture="events")
 def request_handoff(chat):
-    prompt = ("Use an exec_command shell heredoc (cat > NOTES.md) to create NOTES.md with the heading # Delivery and this initial draft "
+    _, workspace, _ = chat
+    prompt = (f"From your starting directory run a shell command using cd {workspace} followed by an exec_command shell heredoc in the same command (cat > NOTES.md) to create NOTES.md with the heading # Delivery and this initial draft "
               "using the following seed text for the first commit (apply confirmed review findings afterward): First initialize the client with `relay init`. Then choose a delivery mode. "
               "For local delivery run `relay local` or for remote delivery run `relay remote`. "
               "Remote delivery requires a signed certificate. Commit the initial document before ending your turn.")
@@ -53,9 +55,9 @@ def _run_turn(chat, prompt):
     _, workspace, env = chat
     output = subprocess.check_output(
         ["codex", "--no-daemon", "exec", "--json", "--trust", "--dangerously-bypass-hook-trust",
-         "--add-dir", str(workspace.parent / "history"), "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6-luna",
+         "--add-dir", str(workspace), "--add-dir", str(workspace.parent / "history"), "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6-luna",
          "-c", 'model_reasoning_effort="low"', prompt],
-        env=env, cwd=workspace, text=True, timeout=320,
+        env=env, cwd=workspace.parent / "start", text=True, timeout=320,
     )
     return [json.loads(line) for line in output.splitlines()]
 

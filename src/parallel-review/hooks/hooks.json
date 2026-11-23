@@ -31,7 +31,7 @@
           {
             "type": "command",
             "command": "python3 \"$PLUGIN_ROOT/hooks/python/dispatch.py\"",
-            "statusMessage": "Observing Markdown edits",
+            "statusMessage": "Observing files for review",
             "timeout": 300
           }
         ],

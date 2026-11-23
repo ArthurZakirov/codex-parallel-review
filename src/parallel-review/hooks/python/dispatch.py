@@ -17,15 +17,19 @@ def handle(event: dict) -> dict:
     if event["hook_event_name"] == "UserPromptSubmit":
         directory.mkdir(mode=0o700, parents=True, exist_ok=True)
         (directory / "request").write_text(event.get("prompt", ""))
+        guide = Path(__file__).resolve().parents[2] / "prompts/main-agent/editing.md"
+        return {"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": guide.read_text()}}
     elif event["hook_event_name"] == "PreToolUse":
         capture(event, directory)
     elif event["hook_event_name"] == "PostToolUse":
         groups = review_inputs(event)
-        documents = capture(event, directory)
-        if documents is not None:
-            groups.pop("markdown", None)
-            if documents:
-                groups["markdown"] = documents
+        observed = capture(event, directory)
+        if event.get("tool_name") == "apply_patch":
+            # Keep the native patch as the change record; snapshots add section context.
+            if observed.get("markdown") and groups.get("markdown"):
+                groups["markdown"].extend(observed["markdown"])
+        else:
+            groups.update(observed)
         if groups:
             _record_edit(directory, event["tool_use_id"], groups)
     elif event["hook_event_name"] == "Stop" and (directory / "edits.db").is_file():

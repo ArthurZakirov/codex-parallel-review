@@ -140,3 +140,74 @@ def test_shell_edit_in_dirty_document_includes_only_changed_section(hook, tmp_pa
     assert "## Commands\nShared setup.\nRun cmd." in text
     assert "+Run cmd." in text
     assert "Unrelated dirty text" not in text
+
+
+def test_shell_from_home_changes_dirty_markdown_and_new_code_elsewhere(hook, tmp_path, monkeypatch):
+    import shlex
+    import subprocess
+
+    send, calls = hook
+    home = tmp_path / "home"
+    target = tmp_path / "other project"
+    home.mkdir()
+    target.mkdir()
+    monkeypatch.setenv("HOME", str(home))
+    (target / "workflow.md").write_text("existing dirty line\n")
+    cmd = f"cd {shlex.quote(str(target))} && echo next >> workflow.md && echo done > step.py"
+    event = dict(cwd=str(home), tool_name="Bash", tool_use_id="outside", tool_input={"command": cmd})
+    send("PreToolUse", **event)
+    subprocess.run(["sh", "-c", cmd], cwd=home, check=True)
+    send("PostToolUse", **event)
+    send("Stop")
+    groups, = calls
+    assert "+next" in groups["markdown"][0]
+    assert "+existing dirty line" not in groups["markdown"][0]
+    assert "+done" in groups["code"][0]
+
+
+def test_absolute_shell_destination_without_changing_directory(hook, tmp_path):
+    import subprocess
+
+    send, calls = hook
+    start = tmp_path / "start"
+    start.mkdir()
+    path = tmp_path / "outside.md"
+    cmd = f"echo evidence > '{path}'"
+    event = dict(cwd=str(start), tool_name="Bash", tool_use_id="absolute", tool_input={"command": cmd})
+    send("PreToolUse", **event)
+    subprocess.run(["sh", "-c", cmd], cwd=start, check=True)
+    send("PostToolUse", **event)
+    send("Stop")
+    assert calls[0]["markdown"] == [f"New document {path}:\nevidence\n"]
+
+
+def test_native_patch_survives_empty_snapshot(hook, tmp_path):
+    send, calls = hook
+    event = dict(patch(str(tmp_path.parent / "external.md"), "new text", "patch"), cwd=str(tmp_path))
+    send("PreToolUse", **event)
+    send("PostToolUse", **event)
+    send("Stop")
+    assert "+new text" in calls[0]["markdown"][0]
+
+
+def test_generator_from_subdirectory_commits_a_sibling_file(hook, tmp_path):
+    import subprocess
+
+    send, calls = hook
+    repo = tmp_path / "checkout"
+    scripts = repo / "scripts"
+    scripts.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    (repo / ".gitignore").write_text("ignored.md\n")
+    (repo / "older.md").write_text("Pre-existing user change.\n")
+    (scripts / "generate").write_text(
+        "echo generated > ../output.md\necho ignored > ../ignored.md\n"
+        "git add ../output.md && git -c user.name=test -c user.email=t@example.org commit -qm generate\n"
+    )
+    event = dict(cwd=str(tmp_path), tool_name="exec_command", tool_use_id="generate",
+                 tool_input={"cmd": "sh generate", "workdir": str(scripts)})
+    send("PreToolUse", **event)
+    subprocess.run(["sh", "generate"], cwd=scripts, check=True)
+    send("PostToolUse", **event)
+    send("Stop")
+    assert calls == [{"markdown": [f"New document {repo}/output.md:\ngenerated\n"]}]

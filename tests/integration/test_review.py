@@ -38,9 +38,12 @@ def review(workspace):
 def verify_report(workspace, handoff):
     report, = (workspace / "review-state").rglob("review.md")
     assert handoff["decision"] == "block" and str(report) in handoff["reason"]
-    sections = report.read_text().split("\n## ")[1:]
-    assert {"Experience", "Standards", "Correctness", "Reader", "Representation"} <= {s.splitlines()[0] for s in sections}
-    assert all(s.partition("\n")[2].strip() for s in sections)
+    import re
+
+    roles = ("Experience", "Standards", "Correctness", "Reader", "Representation")
+    sections = re.split(r"(?m)^## (" + "|".join(roles) + r")$", report.read_text())
+    assert sections[1::2] == list(roles)
+    assert all(body.strip() for body in sections[2::2])
 
 
 @then("a follow-up stop does not request another review")
