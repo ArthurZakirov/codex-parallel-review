@@ -86,7 +86,7 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
     monkeypatch.setattr(reviews.subprocess, "run", capture)
     reviews.parallel_review({"code": ["PYTHON_CANARY"], "markdown": ["MARKDOWN_CANARY"]})
 
-    assert len(prompts) == 4
+    assert len(prompts) == 5
     for prompt in prompts:
         assert ("PYTHON_CANARY" in prompt) != ("MARKDOWN_CANARY" in prompt)
         assert ("MARKDOWN_CANARY" in prompt) == ("MARKDOWN_GUIDANCE_CANARY" in prompt)
@@ -119,3 +119,21 @@ def test_failed_reviewer_does_not_repeatedly_spend_the_turn_budget(hook, monkeyp
         send("Stop")
     send("PostToolUse", **patch("sample.py", "x=2", "retry"))
     assert send("Stop") == {}
+
+
+def test_shell_edit_in_dirty_document_includes_only_changed_section(hook, tmp_path):
+    import subprocess
+
+    send, calls = hook
+    root = tmp_path / "project"
+    root.mkdir()
+    (root / "workflow.md").write_text("# Earlier\nUnrelated dirty text.\n## Commands\nShared setup.\n")
+    event = dict(cwd=str(root), tool_name="exec_command", tool_use_id="cat")
+    send("PreToolUse", **event)
+    subprocess.run(["sh", "-c", "cat >> workflow.md <<'EOF'\nRun cmd.\nEOF"], cwd=root, check=True)
+    send("PostToolUse", **event)
+    send("Stop")
+    text, = calls[0]["markdown"]
+    assert "## Commands\nShared setup.\nRun cmd." in text
+    assert "+Run cmd." in text
+    assert "Unrelated dirty text" not in text

@@ -16,7 +16,14 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 ## How review works
 
-**Parallel Review.** A successful native `apply_patch` call records its patch excerpts under the Codex session and turn IDs. At stop, code goes to experience, standards and correctness reviewers. Markdown goes to the Markdown reviewer. A mixed patch triggers both groups. Each reviewer receives only its assigned excerpts in a temporary workspace. The worker receives one report path and applies confirmed fixes. A repeated stop with no new edits returns immediately. [Supported file types](src/parallel-review/hooks/patches.py) · [Review guidance](src/parallel-review/prompts)
+**Code edits.** Native patches go to experience, standards and correctness reviewers.
+
+**Markdown edits.** Around native patches and shell commands, the hook compares Markdown files in the working directory. For Git workspaces it includes tracked and non-ignored untracked files. A new document goes to both reviewers in full. For an existing document, each receives a diff and the enclosing sections. The submission supplies the writing request when available.
+
+| Reviewer | Review question |
+| --- | --- |
+| Reader | Can the intended reader find the answer, and does each section deliver what its heading promises? |
+| Representation | Can the reader follow, look up or compare the information, and reach its supporting sources? |
 
 **Compare the draft and the fixes.** Ask Codex to commit its initial changes before finishing the turn. When the review finds an issue, the worker receives a [handoff prompt](src/parallel-review/prompts/handoff.md) directing it to create a separate commit for confirmed fixes. Select that follow-up commit in your Git history to inspect its diff against the draft.
 
@@ -28,7 +35,9 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 With `2`, review-guided edits can trigger one verification pass. Use `0` for no passes or `"unlimited"` to keep reviewing while the worker makes new eligible edits. A stop without new edits costs nothing. A failed reviewer launch consumes the attempted pass. Reports remain separate so the worker can identify which pass requested a fix.
 
-**Scope limits.** Discussion, failed patches and pre-existing changes do not trigger reviews. Shell or MCP writes and unrecognized file types are outside this trigger. Use native patches for edits you want reviewed. Reports assess patch evidence; runnable end-to-end UI checks belong in a separate workflow. When installed, the Markdown reviewer also receives the text of `~/.agents/skills/format-markdown/SKILL.md`. To select a different rubric, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute Markdown file visible to the hook. Only the Markdown reviewer receives its text.
+**Capture limits.** Workspace comparisons observe changes during a tool call. Concurrent external edits in the same directory can be included. Background writes after a command returns, MCP writes, ignored untracked files in Git, and writes outside the observed directory can be missed. The hook skips snapshotting the home directory and filesystem root. Native code patches still use their patch evidence.
+
+**Markdown guidance.** Both reviewers receive their own bundled rules with tools disabled. When the local information-representation-design skill is available, the hook includes its structure rules for Reader and its presentation and reference rules for Representation. To supplement both roles, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute path containing additional rules.
 
 ## Tests
 

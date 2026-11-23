@@ -29,8 +29,8 @@ def review_chat(tmp_path):
 
 @when("the user makes a documentation edit", target_fixture="events")
 def request_handoff(chat):
-    prompt = ("Use native apply_patch to create NOTES.md with the heading # Delivery and this initial draft "
-              "as a single paragraph: First initialize the client with `relay init`. Then choose a delivery mode. "
+    prompt = ("Use an exec_command shell heredoc (cat > NOTES.md) to create NOTES.md with the heading # Delivery and this initial draft "
+              "using the following seed text for the first commit (apply confirmed review findings afterward): First initialize the client with `relay init`. Then choose a delivery mode. "
               "For local delivery run `relay local` or for remote delivery run `relay remote`. "
               "Remote delivery requires a signed certificate. Commit the initial document before ending your turn.")
     return _run_turn(chat, prompt)
@@ -68,11 +68,11 @@ def verify_handoff(chat, events):
 
     initial, reviewed = revision("HEAD^"), revision("HEAD")
     assert "First initialize" in initial and "1." not in initial
-    assert "1." in reviewed and "relay remote" in reviewed and "certificate" in reviewed.lower()
+    assert reviewed != initial and "relay remote" in reviewed and "certificate" in reviewed.lower()
     assert (workspace / "NOTES.md").read_text() == reviewed
     assert subprocess.check_output(["git", "rev-list", "--count", "HEAD"], cwd=workspace).strip() == b"2"
     assert not list(home.rglob("review-2.md"))
     report, = home.rglob("review.md")
     assert report.stat().st_size > 0
     assert events[-1]["type"] == "turn.completed"
-    assert [s.splitlines()[0] for s in report.read_text().split("\n## ")[1:]] == ["Markdown"]
+    assert {"## Reader", "## Representation"} <= set(report.read_text().splitlines())

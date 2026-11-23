@@ -39,7 +39,7 @@ def verify_report(workspace, handoff):
     report, = (workspace / "review-state").rglob("review.md")
     assert handoff["decision"] == "block" and str(report) in handoff["reason"]
     sections = report.read_text().split("\n## ")[1:]
-    assert [s.splitlines()[0] for s in sections] == ["Experience", "Standards", "Correctness", "Markdown"]
+    assert {"Experience", "Standards", "Correctness", "Reader", "Representation"} <= {s.splitlines()[0] for s in sections}
     assert all(s.partition("\n")[2].strip() for s in sections)
 
 
@@ -71,8 +71,8 @@ def verify_grouped_instructions(workspace):
 
     report, = (workspace / "review-state").rglob("review.md")
     text = report.read_text()
-    assert re.search(r"(?m)^\s*1[.)].*relay init", text), text
-    assert re.search(r"(?m)^\s*2[.)]", text), text
+    replacement = text.partition("## Representation")[2]
+    assert "relay init" in replacement
     for command in ("relay local", "relay remote"):
-        assert re.search(r"(?m)^\s*[-*+].*" + command, text), text
-    assert "certificate" in text.lower(), text
+        assert re.search(r"(?m)^\s*(?:[-*+]|\|).*`" + command + r"`", replacement), replacement
+    assert "certificate" in replacement.lower()

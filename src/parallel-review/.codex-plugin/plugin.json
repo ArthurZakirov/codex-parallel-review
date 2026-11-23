@@ -1,6 +1,6 @@
 {
   "name": "parallel-review",
-  "version": "0.4.2",
-  "description": "Review code and Markdown changed by native patches in this turn.",
+  "version": "0.5.0",
+  "description": "Review native code patches and Markdown edits from patches and shell commands.",
   "hooks": "./hooks/hooks.json"
 }

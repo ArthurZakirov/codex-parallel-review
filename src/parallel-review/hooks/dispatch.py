@@ -7,14 +7,25 @@ import sqlite3
 import subprocess
 import sys
 
+from documents import capture
 from patches import review_inputs
 from reviews import parallel_review
 
 
 def handle(event: dict) -> dict:
     directory = _turn_directory(event)
-    if event["hook_event_name"] == "PostToolUse":
+    if event["hook_event_name"] == "UserPromptSubmit":
+        directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+        (directory / "request").write_text(event.get("prompt", ""))
+    elif event["hook_event_name"] == "PreToolUse":
+        capture(event, directory)
+    elif event["hook_event_name"] == "PostToolUse":
         groups = review_inputs(event)
+        documents = capture(event, directory)
+        if documents is not None:
+            groups.pop("markdown", None)
+            if documents:
+                groups["markdown"] = documents
         if groups:
             _record_edit(directory, event["tool_use_id"], groups)
     elif event["hook_event_name"] == "Stop" and (directory / "edits.db").is_file():
@@ -42,6 +53,9 @@ def _review_pending(directory: Path) -> dict:
 
     filename = "review.md" if pass_number == 1 else f"review-{pass_number}.md"
     report = directory / filename
+    request = directory / "request"
+    if "markdown" in groups and request.is_file():
+        groups["markdown"].insert(0, "Writing request (context only): " + request.read_text())
     report.write_text(parallel_review(groups))
     budget = f"{pass_number}/{limit}" if limit is not None else str(pass_number)
     prompt = Path(__file__).resolve().parents[1] / "prompts/handoff.md"

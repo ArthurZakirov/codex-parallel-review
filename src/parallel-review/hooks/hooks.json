@@ -6,11 +6,11 @@
           {
             "type": "command",
             "command": "python3 \"$PLUGIN_ROOT/hooks/dispatch.py\"",
-            "statusMessage": "Recording patch for review",
+            "statusMessage": "Recording changes for review",
             "timeout": 300
           }
         ],
-        "matcher": "^apply_patch$"
+        "matcher": "^(apply_patch|Bash|exec_command|write_stdin)$"
       }
     ],
     "Stop": [
@@ -20,6 +20,31 @@
             "type": "command",
             "command": "python3 \"$PLUGIN_ROOT/hooks/dispatch.py\"",
             "statusMessage": "Checking for edits to review",
+            "timeout": 300
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/dispatch.py\"",
+            "statusMessage": "Observing Markdown edits",
+            "timeout": 300
+          }
+        ],
+        "matcher": "^(apply_patch|Bash|exec_command|write_stdin)$"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/dispatch.py\"",
+            "statusMessage": "Recording writing request",
             "timeout": 300
           }
         ]
