@@ -45,6 +45,7 @@ def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filena
         return role
 
     monkeypatch.setattr(reviews, "_review", capture)
+
     if workflow == "manual":
         reviews.review_batches(review.evidence_batches(review.selected_files([tmp_path])), "selected files")
     else:

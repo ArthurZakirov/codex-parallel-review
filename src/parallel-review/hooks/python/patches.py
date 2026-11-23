@@ -23,6 +23,7 @@ def review_inputs(event: dict) -> dict[str, list[str]]:
         section = patch[header.start():end].rstrip("\n")
         move = MOVE.search(section)
         path = PurePath(move[1] if move else header[1])
+
         category = kind(path)
         if category:
             groups.setdefault(category, []).append(section)
