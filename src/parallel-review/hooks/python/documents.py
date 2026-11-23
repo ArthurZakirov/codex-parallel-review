@@ -9,7 +9,8 @@ import re
 import subprocess
 
 from patches import HEADER
-from targets import kind, shell_targets
+from file_types import kind
+from targets import shell_targets
 
 
 def snapshot(root: Path, include_code: bool = False) -> dict[str, str]:

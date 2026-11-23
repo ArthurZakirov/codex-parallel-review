@@ -5,17 +5,7 @@ import os
 import re
 import shlex
 
-from patches import CODE
-
-MARKDOWN = {".md", ".markdown", ".mdx"}
-
-
-def kind(path: Path) -> str | None:
-    if path.suffix.lower() in MARKDOWN:
-        return "markdown"
-    if path.suffix.lower() in CODE or path.name in {"Makefile", "Dockerfile"}:
-        return "code"
-    return None
+from file_types import kind
 
 
 def shell_targets(command: str, cwd: Path) -> tuple[set[Path], set[Path]]:

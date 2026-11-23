@@ -2,9 +2,10 @@
 from pathlib import PurePath
 import re
 
+from file_types import kind
+
 HEADER = re.compile(r"^\*\*\* (?:Add|Update|Delete) File: (.+)$", re.MULTILINE)
 MOVE = re.compile(r"^\*\*\* Move to: (.+)$", re.MULTILINE)
-CODE = frozenset(".py .pyi .js .jsx .ts .tsx .mjs .cjs .go .rs .java .kt .kts .swift .c .h .cc .cpp .hpp .cs .rb .php .scala .sh .bash .zsh .sql .css .scss .html .vue .svelte .lua .r .ex .exs .dart".split())
 
 
 def review_inputs(event: dict) -> dict[str, list[str]]:
@@ -22,9 +23,7 @@ def review_inputs(event: dict) -> dict[str, list[str]]:
         section = patch[header.start():end].rstrip("\n")
         move = MOVE.search(section)
         path = PurePath(move[1] if move else header[1])
-        suffix = path.suffix.lower()
-        if suffix in {".md", ".markdown", ".mdx"}:
-            groups.setdefault("markdown", []).append(section)
-        elif suffix in CODE or path.name in {"Makefile", "Dockerfile"}:
-            groups.setdefault("code", []).append(section)
+        category = kind(path)
+        if category:
+            groups.setdefault(category, []).append(section)
     return groups

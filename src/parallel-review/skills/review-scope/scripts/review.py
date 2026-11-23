@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 PLUGIN = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(PLUGIN / "hooks/python"))
 from reviews import review_batches
-from targets import kind
+from file_types import kind
 
 BATCH_CHARS = 48_000
 
