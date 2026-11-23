@@ -86,7 +86,7 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
     monkeypatch.setattr(reviews.subprocess, "run", capture)
     report = reviews.parallel_review({"code": ["PYTHON_CANARY"], "markdown": ["MARKDOWN_CANARY"]})
 
-    boundary = (reviews.PROMPTS / "review-scope.md").read_text().strip()
+    boundary = (reviews.PROMPTS / "shared/review-scope.md").read_text().strip()
     assert boundary in report
     assert len(prompts) == 5
     for prompt in prompts:

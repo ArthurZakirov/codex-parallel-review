@@ -47,11 +47,11 @@ def _review(job: tuple[str, str]) -> str:
 
 
 def _review_scope() -> str:
-    return (PROMPTS / "review-scope.md").read_text().strip()
+    return (PROMPTS / "shared/review-scope.md").read_text().strip()
 
 
 def _guidance_for(role: str) -> str:
-    guidance = (PROMPTS / f"{role}.md").read_text()
+    guidance = (PROMPTS / "parallel-reviewers" / f"{role}.md").read_text()
     if role not in ROLES["markdown"]:
         return guidance
 

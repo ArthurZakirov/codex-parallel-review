@@ -25,7 +25,7 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 | Reader | Can the intended reader find the answer, and does each section deliver what its heading promises? |
 | Representation | Can the reader follow, look up or compare the information, and reach its supporting sources? |
 
-**Compare the draft and the fixes.** Ask Codex to commit its initial changes before finishing the turn. When the review finds an issue, the worker receives a [handoff prompt](src/parallel-review/prompts/handoff.md) directing it to create a separate commit for confirmed fixes. Select that follow-up commit in your Git history to inspect its diff against the draft.
+**Compare the draft and the fixes.** Ask Codex to commit its initial changes before finishing the turn. When the review finds an issue, the worker receives a [handoff prompt](src/parallel-review/prompts/main-agent/handoff.md) directing it to create a separate commit for confirmed fixes. Select that follow-up commit in your Git history to inspect its diff against the draft.
 
 **Review budget.** By default, each user turn gets one review pass. All applicable reviewers run together. The worker applies confirmed fixes and can finish immediately. Its next user request starts a fresh budget. To change the limit, set `max_review_passes` in `$CODEX_HOME/parallel-review.json` (normally `~/.codex/parallel-review.json`). For example:
 
