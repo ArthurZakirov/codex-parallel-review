@@ -39,6 +39,14 @@ With `2`, review-guided edits can trigger one verification pass. Use `0` for no 
 
 **Markdown guidance.** Both reviewers receive their own bundled rules with tools disabled. When the local information-representation-design skill is available, the hook includes its structure rules for Reader and its presentation and reference rules for Representation. To supplement both roles, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute path containing additional rules.
 
+## Review existing files from chat
+
+Invoke `$review-scope` and name the files, folders, or repository to inspect. For example:
+
+> $review-scope Review README.md and everything under docs/. Focus on instructions that bury command choices in prose. Apply the confirmed fixes.
+
+The skill sends complete files to the applicable review roles, saves their findings in a temporary `review.md`, and hands the report to the current chat. Folder selection includes supported code and Markdown recursively, including ignored files. Git metadata and symbolic links are skipped. Select a narrower folder when generated dependencies would add unnecessary reviews.
+
 ## Tests
 
 1. Install the test dependencies with `python3 -m pip install -r tests/requirements.txt`.

@@ -1,6 +1,6 @@
 # Code organization review
 
-Check the following conventions in the changed code.
+Check the following conventions in the supplied code.
 
 - **Group related operations.** Keep statements that perform one step together. Use a blank line where the purpose changes, such as the transition from loading inputs to evaluating a decision.
 - **Keep orchestration readable.** The entry point should read as a short sequence of named operations at a consistent level of detail. Move a coherent block of parsing, command execution, or persistence into a function when its name helps the reader follow that sequence.
