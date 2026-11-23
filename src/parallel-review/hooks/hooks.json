@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$PLUGIN_ROOT/hooks/python/dispatch.py\"",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/python/entry.py\"",
             "statusMessage": "Recording changes for review",
             "timeout": 300
           }
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$PLUGIN_ROOT/hooks/python/dispatch.py\"",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/python/entry.py\"",
             "statusMessage": "Checking for edits to review",
             "timeout": 300
           }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$PLUGIN_ROOT/hooks/python/dispatch.py\"",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/python/entry.py\"",
             "statusMessage": "Observing files for review",
             "timeout": 300
           }
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$PLUGIN_ROOT/hooks/python/dispatch.py\"",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/python/entry.py\"",
             "statusMessage": "Recording writing request",
             "timeout": 300
           }
