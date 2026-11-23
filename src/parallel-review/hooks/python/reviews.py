@@ -35,10 +35,14 @@ def _review(job: tuple[str, str, str]) -> str:
                   "For every applicable rule give the passage, reader obstacle and replacement Markdown. "
                   "Only return No findings if none apply.")
     prompt += "\n\nMandatory review boundary:\n" + boundary
+    model = os.getenv("PARALLEL_REVIEW_MODEL", "gpt-6.1-terra")
+    if "luna" in model.casefold():
+        raise ValueError("PARALLEL_REVIEW_MODEL cannot select a Luna model.")
+
     with TemporaryDirectory() as workspace:
         command = ["codex", "--no-daemon", "exec", "--ignore-user-config", "--ignore-rules",
                    "--ephemeral", "--skip-git-repo-check", "-C", workspace,
-                   "-m", os.getenv("PARALLEL_REVIEW_MODEL", "gpt-6-luna"),
+                   "-m", model,
                    "-c", 'model_reasoning_effort="low"', "-c", "project_doc_max_bytes=0",
                    "-c", 'default_permissions="review"', "-c", 'permissions.review.filesystem={":minimal"="read"}',
                    "--disable", "hooks", "--disable", "plugins", "--disable", "apps",

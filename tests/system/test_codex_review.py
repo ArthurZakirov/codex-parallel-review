@@ -55,7 +55,7 @@ def _run_turn(chat, prompt):
     _, workspace, env = chat
     output = subprocess.check_output(
         ["codex", "--no-daemon", "exec", "--json", "--trust", "--dangerously-bypass-hook-trust",
-         "--add-dir", str(workspace), "--add-dir", str(workspace.parent / "history"), "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6-luna",
+         "--add-dir", str(workspace), "--add-dir", str(workspace.parent / "history"), "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6.1-terra",
          "-c", 'model_reasoning_effort="low"', prompt],
         env=env, cwd=workspace.parent / "start", text=True, timeout=320,
     )
