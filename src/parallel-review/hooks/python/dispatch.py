@@ -58,7 +58,7 @@ def _review_pending(directory: Path) -> dict:
         groups["markdown"].insert(0, "Writing request (context only): " + request.read_text())
     report.write_text(parallel_review(groups))
     budget = f"{pass_number}/{limit}" if limit is not None else str(pass_number)
-    prompt = Path(__file__).resolve().parents[1] / "prompts/main-agent/handoff.md"
+    prompt = Path(__file__).resolve().parents[2] / "prompts/main-agent/handoff.md"
     return {"decision": "block", "reason": f"Review pass {budget}. " + prompt.read_text().strip().format(report=report)}
 
 

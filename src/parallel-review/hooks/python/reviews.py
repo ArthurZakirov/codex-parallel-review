@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 from tempfile import TemporaryDirectory
 
-PROMPTS = Path(__file__).resolve().parents[1] / "prompts"
+PROMPTS = Path(__file__).resolve().parents[2] / "prompts"
 ROLES = {"code": ("experience", "standards", "correctness"), "markdown": ("reader", "representation")}
 
 

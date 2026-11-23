@@ -21,7 +21,7 @@ def send(workspace, event, **fields):
     env = dict(os.environ, PLUGIN_DATA=str(workspace / "review-state"))
     payload = dict(hook_event_name=event, session_id="review-test", turn_id="turn", cwd=str(workspace), **fields)
     result = subprocess.check_output(
-        [sys.executable, ROOT / "src/parallel-review/hooks/dispatch.py"],
+        [sys.executable, ROOT / "src/parallel-review/hooks/python/dispatch.py"],
         input=json.dumps(payload), text=True, env=env, cwd=workspace, timeout=280,
     )
     return json.loads(result)

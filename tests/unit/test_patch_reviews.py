@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-HOOKS = Path(__file__).resolve().parents[2] / "src/parallel-review/hooks"
+HOOKS = Path(__file__).resolve().parents[2] / "src/parallel-review/hooks/python"
 
 
 @pytest.fixture
