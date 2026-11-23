@@ -30,4 +30,9 @@ With `2`, review-guided edits can trigger one verification pass. Use `0` for no 
 
 ## Tests
 
-Install dependencies with `python3 -m pip install -r tests/requirements.txt`. Run `python3 -m pytest` for unit tests or `python3 -m pytest tests/integration` for live integration tests. Installed-plugin tests use `PARALLEL_REVIEW_TEST_AUTH_HOME="$HOME/.codex" python3 -m pytest tests/system` and require a file-backed Codex login.
+1. Install the test dependencies with `python3 -m pip install -r tests/requirements.txt`.
+2. Choose the suite you want to run.
+
+   - **Unit tests** — `python3 -m pytest`
+   - **Live integration tests** — `python3 -m pytest tests/integration`
+   - **Installed-plugin tests** — `PARALLEL_REVIEW_TEST_AUTH_HOME="$HOME/.codex" python3 -m pytest tests/system`. This suite requires a file-backed Codex login.
