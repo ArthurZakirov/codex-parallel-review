@@ -13,7 +13,7 @@ def parallel_review(groups: dict[str, list[str]]) -> str:
     jobs = [(role, "\n".join(groups[group])) for group in groups for role in ROLES[group]]
     with ThreadPoolExecutor(max_workers=len(jobs)) as pool:
         reports = list(pool.map(_review, jobs))
-    return "# Parallel review\n\n" + "\n".join(reports)
+    return "# Parallel review\n\n" + _review_scope() + "\n\n" + "\n".join(reports)
 
 
 def _review(job: tuple[str, str]) -> str:
@@ -29,6 +29,7 @@ def _review(job: tuple[str, str]) -> str:
                   "Apply the specific role instructions to the literal supplied text. "
                   "For every applicable rule give the passage, reader obstacle and replacement Markdown. "
                   "Only return No findings if none apply.")
+    prompt += "\n\nMandatory review boundary:\n" + _review_scope()
     with TemporaryDirectory() as workspace:
         command = ["codex", "--no-daemon", "exec", "--ignore-user-config", "--ignore-rules",
                    "--ephemeral", "--skip-git-repo-check", "-C", workspace,
@@ -43,6 +44,10 @@ def _review(job: tuple[str, str]) -> str:
     if result.returncode or not result.stdout.strip():
         raise RuntimeError(f"{role} reviewer returned no usable report (exit {result.returncode}). Check Codex login and PARALLEL_REVIEW_MODEL.")
     return f"## {role.capitalize()}\n\n{result.stdout.strip()}\n"
+
+
+def _review_scope() -> str:
+    return (PROMPTS / "review-scope.md").read_text().strip()
 
 
 def _guidance_for(role: str) -> str:

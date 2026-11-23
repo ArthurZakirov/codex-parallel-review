@@ -84,10 +84,13 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
         return SimpleNamespace(returncode=0, stdout="No findings.")
 
     monkeypatch.setattr(reviews.subprocess, "run", capture)
-    reviews.parallel_review({"code": ["PYTHON_CANARY"], "markdown": ["MARKDOWN_CANARY"]})
+    report = reviews.parallel_review({"code": ["PYTHON_CANARY"], "markdown": ["MARKDOWN_CANARY"]})
 
+    boundary = (reviews.PROMPTS / "review-scope.md").read_text().strip()
+    assert boundary in report
     assert len(prompts) == 5
     for prompt in prompts:
+        assert boundary in prompt
         assert ("PYTHON_CANARY" in prompt) != ("MARKDOWN_CANARY" in prompt)
         assert ("MARKDOWN_CANARY" in prompt) == ("MARKDOWN_GUIDANCE_CANARY" in prompt)
 
