@@ -44,7 +44,8 @@ def _review_pending(directory: Path) -> dict:
     report = directory / filename
     report.write_text(parallel_review(groups))
     budget = f"{pass_number}/{limit}" if limit is not None else str(pass_number)
-    return {"decision": "block", "reason": f"Review pass {budget}. Read {report}. Verify findings against the recorded edits and fix confirmed issues."}
+    prompt = Path(__file__).resolve().parents[1] / "prompts/handoff.md"
+    return {"decision": "block", "reason": f"Review pass {budget}. " + prompt.read_text().strip().format(report=report)}
 
 
 def _max_review_passes() -> int | None:

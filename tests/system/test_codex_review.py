@@ -18,11 +18,10 @@ def review_chat(tmp_path):
     workspace = tmp_path / "project"
     workspace.mkdir()
     (workspace / "service.py").write_bytes((ROOT / "tests/fixtures/dispatch_api/service.py").read_bytes())
-    subprocess.run(["git", "init", "-q"], check=True, cwd=workspace)
+    subprocess.run(["git", "init", "-q", "-b", "main", "--separate-git-dir", str(tmp_path / "history")], check=True, cwd=workspace)
     env = dict(os.environ, CODEX_HOME=str(home), HOME=str(tmp_path))
-    guide = tmp_path / "markdown-guide.md"
-    guide.write_text("The required title for NOTES.md is exactly # Reviewed Notes. Report a different title and propose the exact replacement.")
-    env["PARALLEL_REVIEW_MARKDOWN_GUIDE"] = str(guide)
+    env.update(GIT_AUTHOR_NAME="Demo worker", GIT_COMMITTER_NAME="Demo worker",
+               GIT_AUTHOR_EMAIL="demo@example.invalid", GIT_COMMITTER_EMAIL="demo@example.invalid")
     for args in (["marketplace", "add", str(ROOT)], ["add", "parallel-review@codex-parallel-review"]):
         subprocess.run(["codex", "plugin", *args], env=env, cwd=workspace, check=True)
     return home, workspace, env
@@ -30,8 +29,10 @@ def review_chat(tmp_path):
 
 @when("the user makes a documentation edit", target_fixture="events")
 def request_handoff(chat):
-    prompt = ("Use the native apply_patch tool to add NOTES.md containing only # Notes. If a hook requests a report, read it and use apply_patch to replace # Notes with # Reviewed Notes. Then name "
-              "the review section in your final message.")
+    prompt = ("Use native apply_patch to create NOTES.md with the heading # Delivery and this initial draft "
+              "as a single paragraph: First initialize the client with `relay init`. Then choose a delivery mode. "
+              "For local delivery run `relay local` or for remote delivery run `relay remote`. "
+              "Remote delivery requires a signed certificate. Commit the initial document before ending your turn.")
     return _run_turn(chat, prompt)
 
 
@@ -52,22 +53,26 @@ def _run_turn(chat, prompt):
     _, workspace, env = chat
     output = subprocess.check_output(
         ["codex", "--no-daemon", "exec", "--json", "--trust", "--dangerously-bypass-hook-trust",
-         "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6-luna",
+         "--add-dir", str(workspace.parent / "history"), "--skip-git-repo-check", "-s", "workspace-write", "-m", "gpt-6-luna",
          "-c", 'model_reasoning_effort="low"', prompt],
         env=env, cwd=workspace, text=True, timeout=320,
     )
     return [json.loads(line) for line in output.splitlines()]
 
 
-@then("the worker applies a review-guided edit and finishes after one review pass")
+@then("the draft and its review-guided edit are separate commits after one review pass")
 def verify_handoff(chat, events):
     home, workspace, _ = chat
-    assert (workspace / "NOTES.md").read_text().strip() == "# Reviewed Notes"
+    def revision(rev: str) -> str:
+        return subprocess.check_output(["git", "show", rev + ":NOTES.md"], cwd=workspace, text=True)
+
+    initial, reviewed = revision("HEAD^"), revision("HEAD")
+    assert "First initialize" in initial and "1." not in initial
+    assert "1." in reviewed and "relay remote" in reviewed and "certificate" in reviewed.lower()
+    assert (workspace / "NOTES.md").read_text() == reviewed
+    assert subprocess.check_output(["git", "rev-list", "--count", "HEAD"], cwd=workspace).strip() == b"2"
     assert not list(home.rglob("review-2.md"))
     report, = home.rglob("review.md")
     assert report.stat().st_size > 0
     assert events[-1]["type"] == "turn.completed"
-    replies = [event["item"]["text"].lower() for event in events if event["type"] == "item.completed"
-               and event["item"]["type"] == "agent_message"]
-    assert "markdown" in replies[-1], replies
     assert [s.splitlines()[0] for s in report.read_text().split("\n## ")[1:]] == ["Markdown"]
