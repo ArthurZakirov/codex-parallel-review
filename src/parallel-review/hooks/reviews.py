@@ -26,16 +26,16 @@ def _review(job: tuple[str, str]) -> str:
     with TemporaryDirectory() as workspace:
         command = ["codex", "--no-daemon", "exec", "--ignore-user-config", "--ignore-rules",
                    "--ephemeral", "--skip-git-repo-check", "-C", workspace,
-                   "-m", os.getenv("WORK_HOOKS_MODEL", "gpt-6-luna"),
+                   "-m", os.getenv("PARALLEL_REVIEW_MODEL", "gpt-6-luna"),
                    "-c", 'model_reasoning_effort="low"', "-c", "project_doc_max_bytes=0",
                    "-c", 'default_permissions="review"', "-c", 'permissions.review.filesystem={":minimal"="read"}',
                    "--disable", "hooks", "--disable", "plugins", "--disable", "apps",
                    "--disable", "shell_tool", "--disable", "unified_exec", "-"]
         result = subprocess.run(command, input=prompt, cwd=workspace, timeout=240,
                                 text=True, capture_output=True,
-                                env={k: v for k, v in os.environ.items() if k != "JEV_API_KEY"})
+                                env={k: v for k, v in os.environ.items() if not k.endswith("_API_KEY") or k == "OPENAI_API_KEY"})
     if result.returncode or not result.stdout.strip():
-        raise RuntimeError(f"{role} reviewer returned no usable report (exit {result.returncode}). Check Codex login and WORK_HOOKS_MODEL.")
+        raise RuntimeError(f"{role} reviewer returned no usable report (exit {result.returncode}). Check Codex login and PARALLEL_REVIEW_MODEL.")
     return f"## {role.capitalize()}\n\n{result.stdout.strip()}\n"
 
 
@@ -44,7 +44,7 @@ def _guidance_for(role: str) -> str:
     if role != "markdown":
         return guidance
 
-    configured = os.getenv("WORK_HOOKS_MARKDOWN_GUIDE")
+    configured = os.getenv("PARALLEL_REVIEW_MARKDOWN_GUIDE")
     guide = Path(configured).expanduser() if configured else Path.home() / ".agents/skills/format-markdown/SKILL.md"
     if configured or guide.is_file():
         guidance += "\n" + guide.read_text()

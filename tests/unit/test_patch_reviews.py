@@ -74,7 +74,7 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
     import reviews
     guide = tmp_path / "guide.md"
     guide.write_text("MARKDOWN_GUIDANCE_CANARY")
-    monkeypatch.setenv("WORK_HOOKS_MARKDOWN_GUIDE", str(guide))
+    monkeypatch.setenv("PARALLEL_REVIEW_MARKDOWN_GUIDE", str(guide))
     prompts = []
 
     def capture(command, *, input, cwd, **options):

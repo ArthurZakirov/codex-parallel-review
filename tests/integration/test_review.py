@@ -1,4 +1,4 @@
-"""Run the review hook with real local Codex reviewers and no scope plugin."""
+"""Run the review hook with real local Codex reviewers."""
 import json
 import os
 from pathlib import Path
@@ -19,7 +19,6 @@ def sample_workspace(tmp_path):
 
 def send(workspace, event, **fields):
     env = dict(os.environ, PLUGIN_DATA=str(workspace.parent / "review-state"))
-    env.pop("JEV_API_KEY", None)
     payload = dict(hook_event_name=event, session_id="review-test", turn_id="turn", cwd=str(workspace), **fields)
     result = subprocess.check_output(
         [sys.executable, ROOT / "src/parallel-review/hooks/dispatch.py"],

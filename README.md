@@ -14,8 +14,6 @@ cd codex-parallel-review
 
 Start a fresh Codex chat and trust the installed hooks when prompted.
 
-**Moving from Work Hooks?** After installation, remove the previous reviewer with `codex plugin remove parallel-review@work-hooks` before opening a new chat. Scope Check has its own registration. The new reviewer starts with fresh per-chat review history.
-
 ## How review works
 
 **Parallel Review.** A successful native `apply_patch` call records its patch excerpts under the Codex session and turn IDs. At stop, code goes to experience, standards and correctness reviewers. Markdown goes to the Markdown reviewer. A mixed patch triggers both groups. Each reviewer receives only its assigned excerpts in a temporary workspace. The worker receives one report path and applies confirmed fixes. A repeated stop with no new edits returns immediately. [Supported file types](src/parallel-review/hooks/patches.py) · [Review guidance](src/parallel-review/prompts)
@@ -28,9 +26,8 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 With `2`, review-guided edits can trigger one verification pass. Use `0` for no passes or `"unlimited"` to keep reviewing while the worker makes new eligible edits. A stop without new edits costs nothing. A failed reviewer launch consumes the attempted pass. Reports remain separate so the worker can identify which pass requested a fix.
 
-**Scope limits.** Discussion, failed patches and pre-existing changes do not trigger reviews. Shell or MCP writes and unrecognized file types are outside this trigger. Use native patches for edits you want reviewed. Reports assess patch evidence; runnable end-to-end UI checks belong in a separate workflow. When installed, the Markdown reviewer also receives the text of `~/.agents/skills/format-markdown/SKILL.md`. To select a different rubric, set `WORK_HOOKS_MARKDOWN_GUIDE` to an absolute Markdown file visible to the hook. Only the Markdown reviewer receives its text.
-
+**Scope limits.** Discussion, failed patches and pre-existing changes do not trigger reviews. Shell or MCP writes and unrecognized file types are outside this trigger. Use native patches for edits you want reviewed. Reports assess patch evidence; runnable end-to-end UI checks belong in a separate workflow. When installed, the Markdown reviewer also receives the text of `~/.agents/skills/format-markdown/SKILL.md`. To select a different rubric, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute Markdown file visible to the hook. Only the Markdown reviewer receives its text.
 
 ## Tests
 
-Install dependencies with `python3 -m pip install -r tests/requirements.txt`. Run `python3 -m pytest` for unit tests or `python3 -m pytest tests/integration` for live integration tests. Installed-plugin tests use `WORK_HOOKS_TEST_AUTH_HOME="$HOME/.codex" python3 -m pytest tests/system` and require a file-backed Codex login.
+Install dependencies with `python3 -m pip install -r tests/requirements.txt`. Run `python3 -m pytest` for unit tests or `python3 -m pytest tests/integration` for live integration tests. Installed-plugin tests use `PARALLEL_REVIEW_TEST_AUTH_HOME="$HOME/.codex" python3 -m pytest tests/system` and require a file-backed Codex login.

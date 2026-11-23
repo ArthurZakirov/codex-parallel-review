@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def review_chat(tmp_path):
     home = tmp_path / "codex"
     home.mkdir()
-    auth = Path(os.environ["WORK_HOOKS_TEST_AUTH_HOME"]) / "auth.json"
+    auth = Path(os.environ["PARALLEL_REVIEW_TEST_AUTH_HOME"]) / "auth.json"
     (home / "auth.json").symlink_to(auth)
     workspace = tmp_path / "project"
     workspace.mkdir()
@@ -22,8 +22,7 @@ def review_chat(tmp_path):
     env = dict(os.environ, CODEX_HOME=str(home), HOME=str(tmp_path))
     guide = tmp_path / "markdown-guide.md"
     guide.write_text("The required title for NOTES.md is exactly # Reviewed Notes. Report a different title and propose the exact replacement.")
-    env["WORK_HOOKS_MARKDOWN_GUIDE"] = str(guide)
-    env.pop("JEV_API_KEY", None)
+    env["PARALLEL_REVIEW_MARKDOWN_GUIDE"] = str(guide)
     for args in (["marketplace", "add", str(ROOT)], ["add", "parallel-review@codex-parallel-review"]):
         subprocess.run(["codex", "plugin", *args], env=env, cwd=workspace, check=True)
     return home, workspace, env
