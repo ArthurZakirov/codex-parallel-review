@@ -27,6 +27,8 @@ def main() -> None:
     if args.focus:
         boundary += "\n\nUser's review focus:\n" + args.focus
     report = review_batches(evidence_batches(files), boundary)
+    if args.focus:
+        report += "\n## Requested focus\n\n" + args.focus + "\n"
     inventory = "\n".join(f"- `{file}`" for file in files)
 
     destination = Path(mkdtemp(prefix="parallel-review-")) / "review.md"

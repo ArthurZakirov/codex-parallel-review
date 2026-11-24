@@ -87,7 +87,10 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
     report = reviews.parallel_review({"code": ["PYTHON_CANARY"], "markdown": ["MARKDOWN_CANARY"]})
 
     boundary = (reviews.PROMPTS / "shared/review-scope.md").read_text().strip()
-    assert boundary in report
+    assert boundary not in report
+    c1 = next((reviews.PROMPTS / "parallel-reviewers/representation").glob("c1-*.md")).read_text()
+    assert sum(c1 in prompt for prompt in prompts) == 1
+    assert c1.rstrip().endswith("|") and "Apply these **code-explanation rules**" not in c1
     assert len(prompts) == 5
     for prompt in prompts:
         assert boundary in prompt

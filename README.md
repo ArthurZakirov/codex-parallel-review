@@ -22,8 +22,8 @@ Start a fresh Codex chat and trust the installed hooks when prompted.
 
 | Reviewer | Review question |
 | --- | --- |
-| Reader | Can the intended reader find the answer, and does each section deliver what its heading promises? |
-| Representation | Can the reader follow, look up or compare the information, and reach its supporting sources? |
+| Reader | Does each group answer the reader’s question with a clear hierarchy? |
+| Representation | Can the reader scan peer items and identify the exact command, file, or operation? |
 
 **Compare the draft and the fixes.** Ask Codex to commit its initial changes before finishing the turn. When the review finds an issue, the worker receives a [handoff prompt](src/parallel-review/prompts/main-agent/handoff.md) directing it to create a separate commit for confirmed fixes. Select that follow-up commit in your Git history to inspect its diff against the draft.
 
@@ -37,7 +37,7 @@ With `2`, review-guided edits can trigger one verification pass. Use `0` for no 
 
 **Capture limits.** Workspace comparisons observe changes during a tool call. Concurrent external edits in the same directory can be included. A script that computes a destination in another checkout internally can escape observation. Pass its output path explicitly or run it from the destination checkout. Outside Git, directory snapshots cover immediate files. Background writes after the hook returns and writes through MCP can also escape observation. The hook skips snapshotting the home directory and filesystem root. Native code patches still use their patch evidence.
 
-**Markdown guidance.** Both reviewers receive their own bundled rules with tools disabled. When the local information-representation-design skill is available, the hook includes its structure rules for Reader and its presentation and reference rules for Representation. To supplement both roles, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute path containing additional rules.
+**Markdown guidance.** Reader receives [S1](src/parallel-review/prompts/parallel-reviewers/reader/s1-parent-contract.md). Representation receives [T2](src/parallel-review/prompts/parallel-reviewers/representation/t2-scannable-items.md) and [C1 through its comparison table](src/parallel-review/prompts/parallel-reviewers/representation/c1-exact-identifiers.md). These excerpts are bundled with the plugin. To supplement both roles, set `PARALLEL_REVIEW_MARKDOWN_GUIDE` to an absolute file path.
 
 ## Review existing files from chat
 

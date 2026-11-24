@@ -18,7 +18,7 @@ def review_batches(batches: list[dict[str, list[str]]], boundary: str) -> str:
             for groups in batches for category, sections in groups.items() for role in ROLES[category]]
     with ThreadPoolExecutor(max_workers=min(5, len(jobs))) as pool:
         reports = list(pool.map(_review, jobs))
-    return "# Parallel review\n\n" + boundary + "\n\n" + "\n".join(reports)
+    return "# Parallel review\n\n" + "\n".join(reports)
 
 
 def _review(job: tuple[str, str, str]) -> str:
@@ -60,19 +60,11 @@ def _review_scope() -> str:
 
 
 def _guidance_for(role: str) -> str:
-    guidance = (PROMPTS / "parallel-reviewers" / f"{role}.md").read_text()
+    directory = PROMPTS / "parallel-reviewers"
     if role not in ROLES["markdown"]:
-        return guidance
+        return (directory / f"{role}.md").read_text()
 
-    # Resolve canonical rules here: reviewers have no filesystem tools.
-    canonical = Path.home() / ".agents/skills/information-representation-design/SKILL.md"
-    if canonical.is_file():
-        rules = canonical.read_text()
-        structure, separator, presentation = rules.partition('<a id="stage-2"></a>')
-        if separator:
-            guidance = (
-                structure.partition('<a id="stage-1"></a>')[2] if role == "reader" else presentation
-            ) + "\nYour specific review assignment:\n" + guidance
+    guidance = "\n".join(path.read_text() for path in sorted((directory / role).glob("*.md")))
 
     configured = os.getenv("PARALLEL_REVIEW_MARKDOWN_GUIDE")
     if configured:
