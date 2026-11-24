@@ -1,4 +1,4 @@
-### S1 — Define the parent contract
+# Define the parent contract
 
 Choose content from the reading situation:
 

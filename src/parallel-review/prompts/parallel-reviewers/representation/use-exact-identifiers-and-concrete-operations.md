@@ -1,4 +1,4 @@
-#### C1 — Use exact identifiers and concrete operations
+# Use exact identifiers and concrete operations
 
 Apply these steps whenever prose refers to a specific technical object.
 

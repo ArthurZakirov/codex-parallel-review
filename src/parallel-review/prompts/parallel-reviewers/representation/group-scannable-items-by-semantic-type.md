@@ -1,4 +1,4 @@
-#### T2 — Group scannable items by semantic type
+# Group scannable items by semantic type
 
 Follow these **grouping rules**:
 
