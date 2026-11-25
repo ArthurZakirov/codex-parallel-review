@@ -22,4 +22,7 @@ if __name__ == "__main__":
 
 - Check comparable elements such as columns, CLI commands, method signatures, test assertions, and file structures. Flag a change that introduces an unexplained exception to the established pattern.
 - Apply the same check to related modules. If peer client modules consistently expose classes, a new module exposing only loose functions needs a reason for that difference.
-- Prefer absolute imports. Existing packages that consistently use relative imports may keep that convention.
+
+## Imports
+
+Prefer absolute imports. Existing packages that consistently use relative imports may keep that convention.
