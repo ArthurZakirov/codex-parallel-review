@@ -18,6 +18,17 @@ if __name__ == "__main__":
 - Keep the public API small. Once `resolve_id` handles external callers' needs, keep its lookup helpers private when the evidence confirms they have no external callers.
 - Match a module's structure to its name. A module named `dependency_fetcher` suggests a `DependencyFetcher` class that groups the fetching operations. Authentication helpers specific to one client belong on that client.
 
+## Function inputs and results
+
+Flag a hidden record shape when the evidence shows either pattern:
+
+- A function accepts a generic dictionary but relies on particular keys. Its signature should identify the required and optional fields and their types.
+- A function returns a positional tuple, or accepts a collection of tuples, whose positions represent distinct fields that callers must remember. Give those fields meaningful names and types.
+
+Prefer an existing record type. Otherwise, use a dataclass for a domain record, a `TypedDict` when dictionary access is part of the contract, or a `NamedTuple` when tuple compatibility matters. A `TypedDict` describes the expected shape to a type checker; validate untrusted JSON at the input boundary when runtime guarantees are needed.
+
+Keep ordinary collections when their existing types express the contract, such as a mapping from arbitrary IDs to counts.
+
 ## Conventions across peers
 
 - Check comparable elements such as columns, CLI commands, method signatures, test assertions, and file structures. Flag a change that introduces an unexplained exception to the established pattern.
