@@ -10,6 +10,15 @@
 
 Extract fixed settings and meaningful repeated literals from function bodies into named module-level constants.
 
+## Closed sets of values
+
+When branches compare raw strings that represent a known set of states, modes, or actions, look for an existing domain type first. Choose the representation according to how the values are used:
+
+- Use an `Enum` for named members that code compares, such as `Decision.APPROVE`. Use a string-valued enum when a CLI, API, or stored record also requires specific string values. Preserve those external values.
+- Use `Literal["approve", "reject"]` when callers already pass strings and a type annotation is sufficient. A `Literal` annotation alone does not validate incoming data at runtime.
+
+Limit findings to sets the evidence shows are closed. Free-form messages and arbitrary user input can remain strings.
+
 ## Example
 
 `REPORT_FILENAME` names the fixed input file. `build_report` describes the workflow, while the helpers handle CSV parsing and row selection.
