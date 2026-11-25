@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 PROMPTS = Path(__file__).resolve().parents[2] / "prompts"
 ROLES = {"code": ("experience", "standards", "correctness"), "markdown": ("reader", "representation")}
-ROLES["python"] = (*ROLES["code"], "module_ordering")
+ROLES["python"] = (*ROLES["code"], "module_ordering", "python-api", "python-function-design")
 
 
 def parallel_review(groups: dict[str, list[str]]) -> str:
