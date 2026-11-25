@@ -1,11 +1,15 @@
 # Python architecture
 
-Review the supplied changes for dependency direction and package ownership. Ground each finding in a visible import, call, type, or path.
+Apply the rules below for dependency direction and package ownership. Ground each finding in a visible import, call, type, or path.
 
 ## Dependency direction
 
-- Keep business decisions in the core. Translate CLI arguments, HTTP payloads, or hook events at the entry point. An API may import core types and call core functions. Flag a core module that imports an API handler or accepts a framework request purely to extract domain inputs.
-- Define a port around the operation the core needs. Pass that contract into the core. Keep subprocess calls, network requests, and provider-specific serialization inside concrete adapters. Select the adapter where the application is assembled.
+- Keep business decisions in the core.
+- Translate CLI arguments, HTTP payloads, or hook events at the entry point.
+- An API may import core types and call core functions. Flag a core module that imports an API handler or accepts a framework request purely to extract domain inputs.
+- Define a port around the operation the core needs and pass that contract into the core.
+- Keep subprocess calls, network requests, and provider-specific serialization inside concrete adapters.
+- Select the adapter where the application is assembled.
 - Check that providers are interchangeable through the same port. For example, switching a classifier from Codex to Jev should require changing the selected adapter. If it also requires editing the core decision or branching there on provider names, identify that dependency.
 
 ## Package ownership
