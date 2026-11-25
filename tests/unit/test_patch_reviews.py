@@ -43,7 +43,7 @@ def test_reviews_only_accepted_edits_once_and_for_their_own_turn(hook):
     send("PostToolUse", **patch("b.py", "print(2)", "b"))
     assert send("Stop", turn="other") == {}
     assert send("Stop")["decision"] == "block"
-    assert calls == [{"code": ["*** Add File: a.py\n+print(1)", "*** Add File: b.py\n+print(2)"]}]
+    assert calls == [{"python": ["*** Add File: a.py\n+print(1)", "*** Add File: b.py\n+print(2)"]}]
     assert send("Stop", stop_hook_active=True) == {}
 
     send("PostToolUse", **patch("NOTES.md", "# Notes", "c"))
@@ -63,7 +63,7 @@ def test_mixed_patch_routes_by_destination_including_move(hook):
     send("PostToolUse", **event)
     send("Stop")
     groups, = calls
-    assert groups["code"] == ["*** Delete File: unused.py"]
+    assert groups["python"] == ["*** Delete File: unused.py"]
     assert groups["markdown"] == ["*** Update File: old.txt\n*** Move to: Guide.MD\n@@\n-old\n+new"]
 
 
@@ -165,7 +165,7 @@ def test_shell_from_home_changes_dirty_markdown_and_new_code_elsewhere(hook, tmp
     groups, = calls
     assert "+next" in groups["markdown"][0]
     assert "+existing dirty line" not in groups["markdown"][0]
-    assert "+done" in groups["code"][0]
+    assert "+done" in groups["python"][0]
 
 
 def test_absolute_shell_destination_without_changing_directory(hook, tmp_path):

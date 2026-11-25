@@ -25,7 +25,7 @@ def snapshot(root: Path, include_code: bool = False) -> dict[str, str]:
 
     result = {}
     for path in paths:
-        if kind(path) not in ({"markdown", "code"} if include_code else {"markdown"}):
+        if kind(path) not in ({"markdown", "code", "python"} if include_code else {"markdown"}):
             continue
         file = root / path
         if file.is_symlink() or not file.is_file() or not file.resolve().is_relative_to(root):

@@ -7,6 +7,8 @@ MARKDOWN = {".md", ".markdown", ".mdx"}
 
 def kind(path: PurePath) -> str | None:
     suffix = path.suffix.lower()
+    if suffix in {".py", ".pyi"}:
+        return "python"
     if suffix in MARKDOWN:
         return "markdown"
     if suffix in CODE or path.name in {"Makefile", "Dockerfile"}:

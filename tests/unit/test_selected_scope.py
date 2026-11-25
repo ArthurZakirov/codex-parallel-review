@@ -25,10 +25,11 @@ def test_overlapping_paths_include_complete_nested_files_once(tmp_path):
     assert files == sorted([doc, source])
     batch, = review.evidence_batches(files)
     assert "1 | first\n2 | last" in batch["markdown"][0]
-    assert "1 | pass" in batch["code"][0]
+    assert "1 | pass" in batch["python"][0]
 
 
-@pytest.mark.parametrize("filenames", [("guide.MD",), ("service.py",), ("guide.MD", "service.py")])
+@pytest.mark.parametrize("filenames", [("guide.MD",), ("service.py",), ("app.ts",),
+                                       ("guide.MD", "service.py", "app.ts", "types.pyi")])
 @pytest.mark.parametrize("workflow", ["manual", "hook"])
 def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filenames, workflow):
     import patches
@@ -41,6 +42,7 @@ def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filena
     jobs = {}
     def capture(job):
         role, evidence, _ = job
+        assert role not in jobs
         jobs[role] = evidence
         return role
 
@@ -55,7 +57,9 @@ def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filena
         reviews.parallel_review(groups)
 
     expected = {"guide.MD": {"reader", "representation"},
-                "service.py": {"experience", "standards", "correctness"}}
+                "app.ts": {"experience", "standards", "correctness"},
+                "service.py": {"experience", "standards", "correctness", "module_ordering"}}
+    expected["types.pyi"] = expected["service.py"]
     assert set(jobs) == set.union(*(expected[name] for name in filenames))
     for role, evidence in jobs.items():
         for name in filenames:
