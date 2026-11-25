@@ -25,7 +25,13 @@ Flag a hidden record shape when the evidence shows either pattern:
 - A function accepts a generic dictionary but relies on particular keys. Its signature should identify the required and optional fields and their types.
 - A function returns a positional tuple, or accepts a collection of tuples, whose positions represent distinct fields that callers must remember. Give those fields meaningful names and types.
 
-Prefer an existing record type. Otherwise, use a dataclass for a domain record, a `TypedDict` when dictionary access is part of the contract, or a `NamedTuple` when tuple compatibility matters. A `TypedDict` describes the expected shape to a type checker; validate untrusted JSON at the input boundary when runtime guarantees are needed.
+Prefer an existing record type. If a new type is needed, choose it according to the caller's contract.
+
+- Use a dataclass for a domain record.
+- Use a `TypedDict` when callers need dictionary access.
+- Use a `NamedTuple` when callers need tuple compatibility.
+
+A `TypedDict` describes the expected shape to a type checker. When runtime guarantees are needed, validate untrusted JSON at the input boundary.
 
 Keep ordinary collections when their existing types express the contract, such as a mapping from arbitrary IDs to counts.
 
