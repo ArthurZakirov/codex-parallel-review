@@ -11,8 +11,10 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 | Criterion | Passing evidence |
 | --- | --- |
 | Replaceable caller | A notebook or Lambda can call the workflow directly with alert data and a ticket key. It does not need command-line parsing or process exit handling. |
-| Application policy | The application owns the decision-to-status mapping. It invokes classification and ticket-update capabilities supplied by its caller. A fake classifier and ticket updater can exercise the workflow without network or credentials. |
+| Application policy | The application owns the classification instructions and decision-to-status mapping. It invokes model and ticket-update capabilities supplied by its caller. Substitutes can exercise the workflow without network or credentials. |
 | External systems | AWS secret retrieval, model invocation and Jira protocol details have distinct owners outside the workflow. Check where credentials are acquired and how concrete dependencies reach the application. |
 | Module boundaries | Invocation, application policy and vendor operations live in distinct modules. Follow the calls to detect mixed responsibilities even when the filenames suggest separation. |
+| Package boundaries | The actual tree groups related modules into purpose-named directories. Verify which files share a parent and why. A single package containing every implementation file still counts as flat. |
+| Prompt resource | The reusable classification instructions live in a dedicated Markdown file. Trace how the application loads that file and passes the text to the model adapter. |
 
 A single successful run establishes one observed outcome. Keep the worker task fixed when revising the general hook prompt so the next comparison tests the hook change.

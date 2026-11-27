@@ -46,19 +46,9 @@ def check_patch_placement(event: dict) -> dict:
     missing = sorted(targets - recorded_paths(database, root))
     if not missing:
         return {}
-    return deny(f"Review placement before editing {json.dumps(missing)}. Inspect the tree with rg --files "
-                "(or find), then read comparable modules. Split the proposed patch by responsibility. "
-                "Trace the workflow from invocation to result. Keep entry-point parsing, application decisions, "
-                "external service clients and startup wiring in separately owned modules where present. "
-                "Give independently replaceable external systems their own adapter modules. Name each for "
-                "the capability or system it implements. Group operations when they share that owner. "
-                "Can another caller invoke the workflow with substitute dependencies, without starting the "
-                "original interface or importing vendor clients? Revise the proposed paths before submitting. "
-                "For each target submit a JSON object with string fields path, responsibility, rationale and either "
-                "evidence (a comparable existing file) or design (the flow, owner and dependency direction "
-                f"for a new boundary). For new boundaries read {GUIDE}. Run this exact shell form, replacing "
-                f"the placeholder with your JSON array:\n{PLAN_START}[...]"
-                f"{PLAN_END}\nThen retry the revised patch using apply_patch.")
+    template = (GUIDE.parent / "prompts/placement-review.md").read_text(encoding="utf-8")
+    return deny(template.format(targets=json.dumps(missing), guide=GUIDE,
+                                plan_start=PLAN_START, plan_end=PLAN_END).strip())
 
 
 def placement_database(event: dict, root: Path) -> Path:

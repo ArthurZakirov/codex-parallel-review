@@ -4,6 +4,28 @@ Inspect the project tree and read a comparable flow from its entry point to its 
 
 ## Placement matrix
 
+Choose the parent directory for each module as part of the placement decision. Look at the siblings that will sit beside it. In the defect ETL, the package immediately below `pipelines/` names a data stage. Within Silver, the next directory names a capability or tenant scope. Inside that scope, `core/` owns computations and `registry/` owns declarations. Shared mechanisms have a different organizing principle. This excerpt shows how the two groupings coexist.
+
+```text
+src/data_pipeline/
+├── shared/
+│   ├── core/ports/table_store.py
+│   ├── application/pipeline_runner.py
+│   └── infrastructure/delta/delta_table_store.py
+└── pipelines/silver/
+    ├── canonical/registry/schemas.py
+    └── tenants/tenant_a/
+        ├── core/
+        │   ├── normalize_defects.py
+        │   └── normalize_work_orders.py
+        └── registry/
+            ├── schemas.py
+            ├── status_mapping.py
+            └── steps.py
+```
+
+For a new workflow, sketch the smallest tree that makes its real ownership groups visible. Place related modules together and let independent capabilities grow separately. Add another nesting level only when it identifies a meaningful subgroup. Use the target project's language for these directories.
+
 Use the final defect ETL design as a worked example. Paths below are relative to its illustrative `src/data_pipeline/` package. Choose names and boundaries from the target repository.
 
 Place technology dependencies using these criteria.
