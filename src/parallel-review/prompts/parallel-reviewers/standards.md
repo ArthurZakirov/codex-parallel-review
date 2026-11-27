@@ -7,6 +7,7 @@ Check the following conventions in the supplied code.
 - **Separate responsibilities.** In a CLI, keep argument parsing separate from output formatting. In the greeting example, this includes formatting the greeting.
 - **Trace decisions across ports.** Locate each domain rule, including instructions stored as text and outcome-to-action tables. Check that core owns the rule, application code coordinates its use, and the concrete adapter receives the decided action. Transport-specific lookup of an external identifier for a supplied target belongs in the adapter.
 - **Trace each provider binding.** Identify the consumer-owned port declaration, the call through it and the concrete operation bound in composition. Compare their names and signatures. The concrete module and symbol should identify the provider and its operation. Flag consumer-specific resource selection, parsing, validation or errors in an adapter that could serve several consumers.
+- **Check prerequisite capabilities.** Where one external operation supplies input to a second service, verify the application can substitute each required capability independently. A provider import or acquisition hidden inside CLI wiring or another service implementation leaves the first capability outside the application contract.
 - **Name decisions precisely.** Function and variable names should say what is assessed, compared or returned.
 - **Keep imports side-effect free.** Run the CLI through its entry point.
 
