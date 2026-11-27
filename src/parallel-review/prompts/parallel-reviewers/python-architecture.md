@@ -4,15 +4,23 @@ Apply the rules below for dependency direction and package ownership. Ground eac
 
 ## Dependency direction
 
+- For newly introduced external-service boundaries, follow a typed use-case constructor parameter to its application-owned `Protocol`, the matching method on the concrete adapter, and the instance injected at startup. Flag a composition helper that only forwards a protocol operation to a provider function. Move provider state and the real operation onto the concrete adapter. Check that a small in-memory object implementing the same method can be substituted directly.
+
 - Keep business decisions and transformations in the core. Identify them by what result they compute. A transformation can operate on a data frame supplied by its caller.
-- Translate external inputs into the values those decisions need at the entry point.
-- An API may import core types and call core functions. Flag a core module that imports an API handler or accepts a framework request purely to extract domain inputs.
-- When the core must call an external capability, define a port around the operation it needs and supply an implementation. When the caller can perform the I/O before or after a pure transformation, passing the data directly is sufficient.
+- At an entry point, translate invocation arguments into one application operation and present its result. A configured function or a use-case instance constructed with named inputs and invoked via `run()` can satisfy that contract. Inspect the method body for actual orchestration. Flag concrete source reads, dependency assembly, or a build-and-forward wrapper in the invocation path.
+- Review dependencies across a port using the type definition, port annotation and adapter conversion.
+  - Accept an adapter importing the inner request or result type its port declares. Reuse the type when it already expresses the contract.
+  - Flag a provider SDK, handler or wire-schema dependency in core or a port when the evidence shows that replacing the provider would change the inner contract.
+- When an invocation supplies data directly, pass that value to the application. When it supplies a reference and the use case requires retrieval, check that the application calls a source port and the concrete adapter performs the I/O.
 - Keep infrastructure-specific reads, writes, and conversions in adapters. This applies to any external system, including storage and identity services.
 - Select the adapter where the application is assembled.
 - Use a substitution check: if another implementation provided the same operation, which lines of business logic would have to change? Flag a concrete dependency when the supplied code shows that a backend swap would require editing a business decision or transformation.
 
 ## Package ownership
+
+- Locate each new port protocol's defining module. Flag declarations embedded in a workflow or concrete adapter. Place the contracts in a dedicated consumer-owned port module and update the use-case imports. A cohesive set can share one module.
+
+- When both domain policy and use-case sequencing are visible, check the owners of both. Group interchangeable external clients under adapters, pure decisions under core and orchestration under application, using the project's vocabulary. Flag an intermediate function that only constructs and invokes another callable when direct wiring preserves the entry contract.
 
 - Group core decisions, port contracts, and adapters by responsibility when the code actually has those boundaries. A directory name alone does not establish dependency inversion.
 - Keep model definitions with the layer that owns their meaning. For example, domain decisions can live in `core/models.py` and transport payloads in `api/models.py`. Flag a shared models module when it couples otherwise independent layers. A small project can have a single model owner.

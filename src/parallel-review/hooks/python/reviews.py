@@ -6,7 +6,11 @@ import subprocess
 from tempfile import TemporaryDirectory
 
 PROMPTS = Path(__file__).resolve().parents[2] / "prompts"
-ROLES = {"code": ("experience", "standards", "correctness"), "markdown": ("reader", "representation")}
+ROLES = {
+    "code": ("experience", "function-readability", "entry-point-design", "port-contracts-and-bindings",
+             "package-and-policy-ownership", "error-ownership", "correctness"),
+    "markdown": ("reader", "representation"),
+}
 ROLES["python"] = (*ROLES["code"], "module_ordering", "python-api", "python-function-design", "python-architecture")
 
 

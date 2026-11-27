@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "^(apply_patch|Bash)$",
+      "hooks": [{
+        "type": "command",
+        "command": "python3 \"$PLUGIN_ROOT/hooks/placement.py\"",
+        "statusMessage": "Checking proposed file placement"
+      }]
+    }]
+  }
+}

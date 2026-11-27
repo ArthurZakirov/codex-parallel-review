@@ -12,6 +12,12 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
+    },
+    {
+      "name": "architecture-check",
+      "source": {"source": "local", "path": "./src/architecture-check"},
+      "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+      "category": "Developer Tools"
     }
   ]
 }
