@@ -10,7 +10,8 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 
 | Criterion | Passing evidence |
 | --- | --- |
-| Replaceable caller | A notebook or Lambda can call the workflow directly with alert data and a ticket key. It does not need command-line parsing or process exit handling. |
+| Replaceable caller | Trace the CLI from parsed arguments to one configured application call. A notebook or Lambda can invoke the same operation without repeating retrieval, classification or transition steps. |
+| Replaceable input source | The application accepts an alert reference and obtains the text through an injected reader. Substituting an in-memory source requires no CLI parsing, file access or changes to the workflow. |
 | Application policy | The application owns the classification instructions and decision-to-status mapping. It invokes model and ticket-update capabilities supplied by its caller. Substitutes can exercise the workflow without network or credentials. |
 | External systems | AWS secret retrieval, model invocation and Jira protocol details have distinct owners outside the workflow. Check where credentials are acquired and how concrete dependencies reach the application. |
 | Module boundaries | Invocation, application policy and vendor operations live in distinct modules. Follow the calls to detect mixed responsibilities even when the filenames suggest separation. |

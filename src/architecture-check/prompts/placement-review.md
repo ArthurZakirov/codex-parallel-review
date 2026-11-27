@@ -6,7 +6,9 @@ Check the proposed tree against these ownership rules before registering paths.
 
 - **Module ownership.** Keep invocation, application decisions and startup wiring in separately owned modules.
 - **Proposed paths.** For a module centered on one operation or client, derive the filename from that operation or client. Use the owning package to supply context.
-- **Replaceable caller.** Another caller should be able to invoke the workflow with substitute dependencies.
+- **Invocation.** Have each entry point translate its arguments or event into one application call and present the result. Put dependency assembly in startup wiring.
+- **Input acquisition.** Distinguish data supplied in the invocation from a reference identifying data to retrieve. When retrieval is a step of the use case, have the application invoke an input-source port. Place file, stream and remote reads in concrete adapters.
+- **Replaceable caller.** Trace a second caller using a different source. It should invoke the same application operation without repeating any retrieval, processing or update steps.
 - **External systems.** Give independently replaceable systems their own adapter modules. Translate application requests into the provider's wire format and supply transport credentials there.
 - **Decision criteria.** Place the rules for deciding an outcome with the application that defines them.
 - **Prompt resources.** Store reusable model instructions in a dedicated Markdown resource under the owning package. Load it independently of the current directory.
