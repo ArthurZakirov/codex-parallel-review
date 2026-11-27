@@ -14,6 +14,12 @@ cd codex-parallel-review
 
 Start a fresh Codex chat and trust the installed hooks when prompted.
 
+## Optional pre-edit architecture check
+
+Run `./install architecture-check` and trust its hook in a fresh local Codex chat. The first native patch targeting an uncovered non-Markdown path pauses before writing. Codex inspects the repository, records the intended responsibility for each path and retries. Existing modules serve as placement evidence. For new boundaries, the [routing matrix and defect ETL example](src/architecture-check/routing.md) guide the design. Mixed patches can use both routes.
+
+Plans apply to one session, turn and working directory. The hook checks paths and required plan fields. Codex judges whether the placement fits. A covered path can be edited again during the turn. Shell writes, generators and edits through other tools are outside this hook's coverage. Use native patches for edits that need placement review.
+
 ## How review works
 
 **Code edits.** Native and observed shell edits go to experience, standards and correctness reviewers.

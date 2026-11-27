@@ -1,0 +1,6 @@
+{
+  "name": "architecture-check",
+  "version": "0.1.0",
+  "description": "Check the placement of proposed source edits before Codex applies a patch.",
+  "hooks": "./hooks/hooks.json"
+}
