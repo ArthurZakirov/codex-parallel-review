@@ -57,7 +57,7 @@ def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filena
         reviews.parallel_review(groups)
 
     code_roles = {"experience", "function-readability", "entry-point-design",
-                  "port-contracts-and-bindings", "package-and-policy-ownership", "correctness"}
+                  "port-contracts-and-bindings", "package-and-policy-ownership", "error-ownership", "correctness"}
     expected = {"guide.MD": {"reader", "representation"},
                 "app.ts": code_roles,
                 "service.py": code_roles | {"module_ordering", "python-api", "python-function-design",

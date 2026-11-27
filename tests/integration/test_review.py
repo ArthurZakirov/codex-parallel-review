@@ -41,7 +41,7 @@ def verify_report(workspace, handoff):
     import re
 
     roles = ("Experience", "Function-readability", "Entry-point-design", "Port-contracts-and-bindings",
-             "Package-and-policy-ownership", "Correctness", "Reader", "Representation")
+             "Package-and-policy-ownership", "Error-ownership", "Correctness", "Reader", "Representation")
     sections = re.split(r"(?m)^## (" + "|".join(roles) + r")$", report.read_text())
     assert sections[1::2] == list(roles)
     assert all(body.strip() for body in sections[2::2])
