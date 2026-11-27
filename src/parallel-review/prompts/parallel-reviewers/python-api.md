@@ -16,7 +16,8 @@ if __name__ == "__main__":
 - Annotate function and method parameters and return values. The implicit `self` or `cls` can remain unannotated.
 - Prefer standard-library types when they express the same contract as a custom type. For example, use `collections.abc.Callable[[str], int]` for a callback that accepts a string and returns an integer.
 - Keep the public API small. Once `resolve_id` handles external callers' needs, keep its lookup helpers private when the evidence confirms they have no external callers.
-- Match a module's structure to its name. A module named `dependency_fetcher` suggests a `DependencyFetcher` class that groups the fetching operations. Authentication helpers specific to one client belong on that client.
+- Compare the filename with the primary public function or class visible in the patch. For a single-operation module, the filename should match or closely describe the callable (for example, `fetch_dependency.py` exposing `fetch_dependency`). A client-named module such as `dependency_client.py` should expose a recognizable `DependencyClient`. Keep client-specific authentication helpers with that client.
+- When the names diverge, identify the path, primary symbol and smallest coherent rename, including affected imports. Prefer naming a file after an existing standalone operation when introducing a class would serve only to match the filename. Preserve framework-defined filenames such as `__main__.py` and assess the callable name separately.
 
 ## Function inputs and results
 
