@@ -15,7 +15,7 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 | Application policy | The application owns the classification instructions and decision-to-status mapping. It invokes model and ticket-update capabilities supplied by its caller. Substitutes can exercise the workflow without network or credentials. |
 | External systems | AWS secret retrieval, model invocation and Jira protocol details have distinct owners outside the workflow. Check where credentials are acquired and how concrete dependencies reach the application. |
 | Module boundaries | Invocation, application policy and vendor operations live in distinct modules. Follow the calls to detect mixed responsibilities even when the filenames suggest separation. |
-| Package boundaries | The actual tree groups related modules into purpose-named directories. Verify which files share a parent and why. A single package containing every implementation file still counts as flat. |
+| Package boundaries | Locate the verdict policy in core, sequencing in application and concrete I/O in adapters. Check what each package actually does. Trace the configured application call and flag wrappers that only construct or forward to another callable. |
 | Prompt resource | The reusable classification instructions live in a dedicated Markdown file. Trace how the application loads that file and passes the text to the model adapter. |
 | Request ownership | A substitute model receives the complete ordered request, including the distinction between instructions and alert data. The adapter owns provider field names, credentials and transport. |
 | Module names | Compare each single-purpose module's filename to its primary callable or class. Check framework-defined entry points separately. |

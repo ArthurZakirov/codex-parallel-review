@@ -14,6 +14,8 @@ Apply the rules below for dependency direction and package ownership. Ground eac
 
 ## Package ownership
 
+- When both domain policy and use-case sequencing are visible, check the owners of both. Group interchangeable external clients under adapters, pure decisions under core and orchestration under application, using the project's vocabulary. Flag an intermediate function that only constructs and invokes another callable when direct wiring preserves the entry contract.
+
 - Group core decisions, port contracts, and adapters by responsibility when the code actually has those boundaries. A directory name alone does not establish dependency inversion.
 - Keep model definitions with the layer that owns their meaning. For example, domain decisions can live in `core/models.py` and transport payloads in `api/models.py`. Flag a shared models module when it couples otherwise independent layers. A small project can have a single model owner.
 - When sibling filenames repeat a meaningful prefix, check whether it names a coherent package. Recommend moving the files into that package and dropping the prefix only when the visible siblings share that responsibility.
