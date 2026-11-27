@@ -13,6 +13,7 @@ if __name__ == "__main__":
 
 ## Interfaces and ownership
 
+- Flag a dataclass that holds service dependencies and executes a workflow. Use an ordinary runner class with an explicit typed constructor for the dependencies.
 - Annotate function and method parameters and return values. The implicit `self` or `cls` can remain unannotated.
 - Prefer standard-library types when they express the same contract as a custom type. For example, use `collections.abc.Callable[[str], int]` for a callback that accepts a string and returns an integer.
 - Keep the public API small. Once `resolve_id` handles external callers' needs, keep its lookup helpers private when the evidence confirms they have no external callers.
@@ -28,7 +29,7 @@ Flag a hidden record shape when the evidence shows either pattern:
 
 Prefer an existing record type. If a new type is needed, choose it according to the caller's contract.
 
-- Use a dataclass for a structured input or result. Trace an instance to the function that consumes or returns it. Flag a dataclass whose purpose is to hold service dependencies and execute a workflow, even when its decorator only supplies the constructor. Keep the runner's behavior on an ordinary class and inject its dependencies through an explicit typed constructor.
+- Use a dataclass for a structured input or result. Trace an instance to the function that consumes or returns it.
 - Use a `TypedDict` when callers need dictionary access.
 - Use a `NamedTuple` when callers need tuple compatibility.
 
