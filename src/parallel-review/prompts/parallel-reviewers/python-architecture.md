@@ -16,6 +16,8 @@ Apply the rules below for dependency direction and package ownership. Ground eac
 
 ## Package ownership
 
+- Locate each new port protocol's defining module. Flag declarations embedded in a workflow or concrete adapter. Place the contracts in a dedicated consumer-owned port module and update the use-case imports. A cohesive set can share one module.
+
 - When both domain policy and use-case sequencing are visible, check the owners of both. Group interchangeable external clients under adapters, pure decisions under core and orchestration under application, using the project's vocabulary. Flag an intermediate function that only constructs and invokes another callable when direct wiring preserves the entry contract.
 
 - Group core decisions, port contracts, and adapters by responsibility when the code actually has those boundaries. A directory name alone does not establish dependency inversion.
