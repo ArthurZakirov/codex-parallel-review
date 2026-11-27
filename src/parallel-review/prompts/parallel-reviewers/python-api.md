@@ -28,7 +28,7 @@ Flag a hidden record shape when the evidence shows either pattern:
 
 Prefer an existing record type. If a new type is needed, choose it according to the caller's contract.
 
-- Use a dataclass for a domain record.
+- Use a dataclass for a structured input or result. Trace an instance to the function that consumes or returns it. Flag a dataclass whose purpose is to hold service dependencies and execute a workflow, even when its decorator only supplies the constructor. Keep the runner's behavior on an ordinary class and inject its dependencies through an explicit typed constructor.
 - Use a `TypedDict` when callers need dictionary access.
 - Use a `NamedTuple` when callers need tuple compatibility.
 
