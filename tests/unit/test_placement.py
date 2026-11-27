@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -24,7 +25,8 @@ def test_mixed_placement_move_and_turn_scope(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         placement.submit(database, [existing, dict(new, evidence="../missing")])
     assert placement.check_patch_placement(event)["hookSpecificOutput"]["permissionDecisionReason"] == reason
-    placement.submit(database, [existing, new])
+    command = placement.PLAN_START + json.dumps([existing, new]) + placement.PLAN_END
+    assert placement.handle(dict(event, tool_name="Bash", tool_input={"command": command})) == {}
     assert placement.check_patch_placement(event) == {}
     assert placement.check_patch_placement(dict(event, turn_id="next"))["hookSpecificOutput"]["permissionDecision"] == "deny"
 

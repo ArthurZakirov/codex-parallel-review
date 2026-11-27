@@ -4,29 +4,34 @@ import json
 import os
 from pathlib import Path
 import re
-import shlex
 import sqlite3
 import sys
 
 
 GUIDE = Path(__file__).resolve().parents[1] / "routing.md"
 HEADER = re.compile(r"^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$", re.M)
+PLAN_START = "cat <<'CODEX_PLACEMENT_PLAN'\n"
+PLAN_END = "\nCODEX_PLACEMENT_PLAN"
 
 
 def main() -> None:
     try:
         payload = json.load(sys.stdin)
-        if len(sys.argv) == 1:
-            print(json.dumps(check_patch_placement(payload)))
-        elif len(sys.argv) == 3 and sys.argv[1] == "submit":
-            submit(Path(sys.argv[2]), payload)
-            print("Placement plan recorded.")
-        else:
-            sys.exit("Expected submit DATABASE with a JSON array on stdin.")
+        print(json.dumps(handle(payload)))
     except (KeyError, TypeError, ValueError, RuntimeError, OSError, sqlite3.Error) as error:
-        if len(sys.argv) > 1:
-            sys.exit(str(error))
         print(json.dumps(deny(f"Could not check patch placement: {error}")))
+
+
+def handle(event: dict) -> dict:
+    if event["tool_name"] == "apply_patch":
+        return check_patch_placement(event)
+    command = event["tool_input"].get("command", "").rstrip()
+    if command.startswith(PLAN_START):
+        if not command.endswith(PLAN_END):
+            raise ValueError("End the placement submission with CODEX_PLACEMENT_PLAN.")
+        entries = json.loads(command[len(PLAN_START):-len(PLAN_END)])
+        submit(placement_database(event, Path(event["cwd"]).resolve()), entries)
+    return {}
 
 
 def check_patch_placement(event: dict) -> dict:
@@ -37,20 +42,30 @@ def check_patch_placement(event: dict) -> dict:
 
     if not targets:
         return {}
-    identity = json.dumps([event["session_id"], event["turn_id"], str(root)])
-    state = Path(os.environ["PLUGIN_DATA"]) / sha256(identity.encode()).hexdigest()
-    state.mkdir(parents=True, exist_ok=True, mode=0o700)
-    database = state / "placement.db"
+    database = placement_database(event, root)
     missing = sorted(targets - recorded_paths(database, root))
     if not missing:
         return {}
-    command = shlex.join(["python3", str(Path(__file__).resolve()), "submit", str(database)])
     return deny(f"Review placement before editing {json.dumps(missing)}. Inspect the tree with rg --files "
                 "(or find), then read comparable modules. Split the proposed patch by responsibility. "
+                "Trace the workflow from invocation to result. Keep entry-point parsing, application decisions, "
+                "external service clients and startup wiring in separately owned modules where present. "
+                "Give independently replaceable external systems their own adapter modules. Name each for "
+                "the capability or system it implements. Group operations when they share that owner. "
+                "Can another caller invoke the workflow with substitute dependencies, without starting the "
+                "original interface or importing vendor clients? Revise the proposed paths before submitting. "
                 "For each target submit a JSON object with string fields path, responsibility, rationale and either "
                 "evidence (a comparable existing file) or design (the flow, owner and dependency direction "
-                f"for a new boundary). For new boundaries read {GUIDE}. Pipe the JSON array to "
-                f"{command} on stdin, then retry the revised patch using apply_patch.")
+                f"for a new boundary). For new boundaries read {GUIDE}. Run this exact shell form, replacing "
+                f"the placeholder with your JSON array:\n{PLAN_START}[...]"
+                f"{PLAN_END}\nThen retry the revised patch using apply_patch.")
+
+
+def placement_database(event: dict, root: Path) -> Path:
+    identity = json.dumps([event["session_id"], event["turn_id"], str(root)])
+    state = Path(os.environ["PLUGIN_DATA"]) / sha256(identity.encode()).hexdigest()
+    state.mkdir(parents=True, exist_ok=True, mode=0o700)
+    return state / "placement.db"
 
 
 def submit(database: Path, entries: object) -> None:

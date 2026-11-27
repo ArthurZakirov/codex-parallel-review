@@ -20,6 +20,8 @@ Run `./install architecture-check` and trust its hook in a fresh local Codex cha
 
 Plans apply to one session, turn and working directory. The hook checks paths and required plan fields. Codex judges whether the placement fits. A covered path can be edited again during the turn. Shell writes, generators and edits through other tools are outside this hook's coverage. Use native patches for edits that need placement review.
 
+The [placement experiment](tests/system/placement-experiment.md) includes a repeatable worker task and a separate evaluation guide. To inspect the decision, compare the blocked patch in the session transcript with the files in the successful retry.
+
 ## How review works
 
 **Code edits.** Native and observed shell edits go to experience, standards and correctness reviewers.
