@@ -10,7 +10,7 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 
 | Criterion | Passing evidence |
 | --- | --- |
-| Replaceable caller | Trace the CLI from parsed arguments to one configured application call. A notebook or Lambda can invoke the same operation without repeating retrieval, classification or transition steps. |
+| Replaceable caller | Trace the CLI from parsed arguments to one application operation. Accept a directly bound function or a use-case instance whose `run()` implements the sequence. A notebook or Lambda can invoke the same operation without repeating retrieval, classification or transition steps. |
 | Replaceable input source | The application accepts an alert reference and obtains the text through an injected reader. Substituting an in-memory source requires no CLI parsing, file access or changes to the workflow. |
 | Application policy | The application owns the classification instructions and decision-to-status mapping. It invokes model and ticket-update capabilities supplied by its caller. Substitutes can exercise the workflow without network or credentials. |
 | External systems | AWS secret retrieval, model invocation and Jira protocol details have distinct owners outside the workflow. Check where credentials are acquired and how concrete dependencies reach the application. |
@@ -20,4 +20,4 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 | Request ownership | A substitute model receives the complete ordered request, including the distinction between instructions and alert data. The adapter owns provider field names, credentials and transport. |
 | Module names | Compare each single-purpose module's filename to its primary callable or class. Check framework-defined entry points separately. |
 
-A single successful run establishes one observed outcome. Keep the worker task fixed when revising the general hook prompt so the next comparison tests the hook change.
+Judge only the worker's untouched output after its post-edit review. A finding in the report counts as detected; count it as fixed only after inspecting the final code. Keep manual corrections outside the evaluated workspace. After a failed criterion, change the responsible hook or prompt and rerun the unchanged worker task in a fresh directory. A single successful run establishes one observed outcome.
