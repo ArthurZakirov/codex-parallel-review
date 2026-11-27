@@ -8,7 +8,7 @@ Apply the rules below for dependency direction and package ownership. Ground eac
 
 - Keep business decisions and transformations in the core. Identify them by what result they compute. A transformation can operate on a data frame supplied by its caller.
 - At an entry point, translate invocation arguments into one application operation and present its result. A configured function or a use-case instance constructed with named inputs and invoked via `run()` can satisfy that contract. Inspect the method body for actual orchestration. Flag concrete source reads, dependency assembly, or a build-and-forward wrapper in the invocation path.
-- An API may import core types and call core functions. Flag a core module that imports an API handler or accepts a framework request purely to extract domain inputs.
+- An adapter may import an inner request or result type declared in its port signature. Compare the defining fields, port annotation and adapter conversion before reporting a violation. An inward import alone warrants neither a duplicate DTO nor a move to a shared module. Flag a core or port dependency on a provider SDK, handler or wire schema when the evidence shows a provider swap would change the inner contract.
 - When an invocation supplies data directly, pass that value to the application. When it supplies a reference and the use case requires retrieval, check that the application calls a source port and the concrete adapter performs the I/O.
 - Keep infrastructure-specific reads, writes, and conversions in adapters. This applies to any external system, including storage and identity services.
 - Select the adapter where the application is assembled.
