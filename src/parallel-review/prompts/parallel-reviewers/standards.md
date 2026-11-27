@@ -11,6 +11,9 @@ Check the following conventions in the supplied code.
 - **Name decisions precisely.** Function and variable names should say what is assessed, compared or returned.
 - **Keep imports side-effect free.** Run the CLI through its entry point.
 
+- **Check root placement.** For a new single-entry executable, inspect every root-level source path. Flag implementation modules beside the launch script and identify their package owners. Review root-level metadata according to its tooling conventions.
+- **Check direct binding.** Trace each concrete object supplied to an application port. If one concrete adapter wraps another solely to select a configured resource and reconcile method signatures, check whether configuring the provider object directly would satisfy the port. Preserve any consumer-specific validation with the consumer.
+
 ## Reporting findings
 
 For each finding, cite the relevant lines and explain which operations are hard to distinguish or follow. Skip hypothetical refactors.

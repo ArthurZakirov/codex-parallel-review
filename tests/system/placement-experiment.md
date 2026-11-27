@@ -22,6 +22,8 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 | Python runners | Verify that the class executing the workflow has an explicit typed constructor for its ports and owns the orchestration method. |
 | Module boundaries | Invocation, application policy and vendor operations live in distinct modules. Follow the calls to detect mixed responsibilities even when the filenames suggest separation. |
 | Package boundaries | Locate the verdict policy in core, sequencing in application and concrete I/O in adapters. Check what each package actually does. |
+| Root layout | Enumerate root source files. Only the launch script belongs there. Check the package owners of wiring, environment settings and errors, and distinguish dependency manifests from executable source. |
+| Direct provider binding | Trace the model-key constructor argument to one configured AWS adapter instance. Verify that the adapter itself satisfies the port, and locate any model-key validation on the consumer side. |
 | Delegation | Trace the configured application call and flag wrappers that only construct or forward to another callable. |
 | Prompt resource | Trace the core-owned Markdown instructions and alert text into the complete semantic request that the application supplies to the model port. |
 | Request ownership | A substitute model receives the complete ordered request, including the distinction between instructions and alert data. The adapter owns provider field names, credentials and transport. |
