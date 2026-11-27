@@ -1,5 +1,8 @@
 # Port contracts and bindings
 
-- **Trace each provider binding.** Identify the consumer-owned port declaration, the call through it and the concrete operation bound in composition. Compare their names and signatures. The concrete module and symbol should identify the provider and its operation. Flag consumer-specific resource selection, parsing, validation or errors in an adapter that could serve several consumers.
+Apply these rules when reviewing a port and its concrete bindings.
+
+- **Trace each provider binding.** Identify the consumer-owned port declaration, the call through it and the concrete operation bound in composition. Compare their names and signatures. The concrete module and symbol should identify the provider and its operation.
+- **Check adapter ownership.** Flag consumer-specific resource selection, parsing, validation or errors in an adapter that could serve several consumers.
 - **Check prerequisite capabilities.** When acquisition is a requested step, verify that the application invokes a named port for the value it needs before using that value. Substituting a fake that returns the needed value is sufficient. Preserve this abstraction when reviewing its binding: composition may bind a configured resource identifier and interpret a provider result to satisfy the consumer's contract. Do not replace a satisfied consumer port with a lower-level storage API or move deployment selectors into the use case merely to expose calls inside its binding.
 - **Check direct binding.** Trace each concrete object supplied to an application port. If one concrete adapter wraps another solely to select a configured resource and reconcile method signatures, check whether configuring the provider object directly would satisfy the port. Preserve any consumer-specific validation with the consumer.
