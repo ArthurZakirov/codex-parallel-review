@@ -3,7 +3,7 @@
 Check the following conventions in the supplied code.
 
 - **Group related operations.** Keep statements that perform one step together. Use a blank line where the purpose changes, such as the transition from loading inputs to evaluating a decision.
-- **Keep orchestration readable.** The entry point should read as a short sequence of named operations at a consistent level of detail. Move a coherent block of parsing, command execution, or persistence into a function when its name helps the reader follow that sequence.
+- **Keep orchestration in the application.** Trace a CLI or event handler from parsed inputs to the result. It should call a configured application operation directly, or construct the use-case object from those inputs and call its substantive `run()`. Flag a handler that calls a factory to get a workflow and then invokes that workflow. Bind dependencies outside the handler while preserving help and argument parsing without credentials.
 - **Separate responsibilities.** In a CLI, keep argument parsing separate from output formatting. In the greeting example, this includes formatting the greeting.
 - **Name decisions precisely.** Function and variable names should say what is assessed, compared or returned.
 - **Keep imports side-effect free.** Run the CLI through its entry point.
