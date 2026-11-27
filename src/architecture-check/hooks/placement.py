@@ -6,12 +6,26 @@ from pathlib import Path
 import re
 import sqlite3
 import sys
+from typing import TypedDict
 
 
 GUIDE = Path(__file__).resolve().parents[1] / "routing.md"
+PLACEMENT_REVIEW_TEMPLATE = GUIDE.parent / "prompts/placement-review.md"
 HEADER = re.compile(r"^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)$", re.M)
 PLAN_START = "cat <<'CODEX_PLACEMENT_PLAN'\n"
 PLAN_END = "\nCODEX_PLACEMENT_PLAN"
+
+
+class ToolInput(TypedDict):
+    command: str
+
+
+class PlacementEvent(TypedDict):
+    tool_name: str
+    tool_input: ToolInput
+    cwd: str
+    session_id: str
+    turn_id: str
 
 
 def main() -> None:
@@ -22,9 +36,10 @@ def main() -> None:
         print(json.dumps(deny(f"Could not check patch placement: {error}")))
 
 
-def handle(event: dict) -> dict:
+def handle(event: PlacementEvent) -> dict:
     if event["tool_name"] == "apply_patch":
         return check_patch_placement(event)
+
     command = event["tool_input"].get("command", "").rstrip()
     if command.startswith(PLAN_START):
         if not command.endswith(PLAN_END):
@@ -34,7 +49,7 @@ def handle(event: dict) -> dict:
     return {}
 
 
-def check_patch_placement(event: dict) -> dict:
+def check_patch_placement(event: PlacementEvent) -> dict:
     root = Path(event["cwd"]).resolve()
     names = HEADER.findall(event["tool_input"]["command"])
     targets = {relative_path(root, name) for name in names
@@ -46,12 +61,12 @@ def check_patch_placement(event: dict) -> dict:
     missing = sorted(targets - recorded_paths(database, root))
     if not missing:
         return {}
-    template = (GUIDE.parent / "prompts/placement-review.md").read_text(encoding="utf-8")
+    template = PLACEMENT_REVIEW_TEMPLATE.read_text(encoding="utf-8")
     return deny(template.format(targets=json.dumps(missing), guide=GUIDE,
                                 plan_start=PLAN_START, plan_end=PLAN_END).strip())
 
 
-def placement_database(event: dict, root: Path) -> Path:
+def placement_database(event: PlacementEvent, root: Path) -> Path:
     identity = json.dumps([event["session_id"], event["turn_id"], str(root)])
     state = Path(os.environ["PLUGIN_DATA"]) / sha256(identity.encode()).hexdigest()
     state.mkdir(parents=True, exist_ok=True, mode=0o700)

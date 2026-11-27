@@ -4,8 +4,10 @@ Inspect the tree with `rg --files` or `find`, then read comparable modules. Trac
 
 Check the proposed tree against these ownership rules before registering paths.
 
-- **Entry points and workflow.** Keep invocation, application decisions and startup wiring in separately owned modules. Another caller should be able to invoke the workflow with substitute dependencies.
-- **External systems.** Give independently replaceable systems their own adapter modules. Keep protocol translation there and decision criteria with the application.
+- **Module ownership.** Keep invocation, application decisions and startup wiring in separately owned modules.
+- **Replaceable caller.** Another caller should be able to invoke the workflow with substitute dependencies.
+- **External systems.** Give independently replaceable systems their own adapter modules. Keep protocol translation in those modules.
+- **Decision criteria.** Place the rules for deciding an outcome with the application that defines them.
 - **Prompt resources.** When the application sends reusable natural-language instructions to a model, store the instructions in a dedicated Markdown resource under the owning package. Load that resource independently of the caller's current directory. Pass its text through the application boundary to the adapter.
 - **Directories.** Group related modules into named packages by capability or architectural role. Inspect the parent and siblings of each proposed path. In a new project, create the directories that express those groups.
 
