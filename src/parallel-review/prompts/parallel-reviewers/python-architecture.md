@@ -4,6 +4,8 @@ Apply the rules below for dependency direction and package ownership. Ground eac
 
 ## Dependency direction
 
+- For newly introduced external-service boundaries, follow a typed use-case constructor parameter to its application-owned `Protocol`, the matching method on the concrete adapter, and the instance injected at startup. Flag a composition helper that only forwards a protocol operation to a provider function. Move provider state and the real operation onto the concrete adapter. Check that a small in-memory object implementing the same method can be substituted directly.
+
 - Keep business decisions and transformations in the core. Identify them by what result they compute. A transformation can operate on a data frame supplied by its caller.
 - At an entry point, translate invocation arguments into one application operation and present its result. A configured function or a use-case instance constructed with named inputs and invoked via `run()` can satisfy that contract. Inspect the method body for actual orchestration. Flag concrete source reads, dependency assembly, or a build-and-forward wrapper in the invocation path.
 - An API may import core types and call core functions. Flag a core module that imports an API handler or accepts a framework request purely to extract domain inputs.
