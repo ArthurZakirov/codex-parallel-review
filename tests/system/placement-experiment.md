@@ -12,11 +12,12 @@ Give a fresh Codex session the [triage CLI task](prompts/vulnerability-triage.md
 | --- | --- |
 | Replaceable caller | Trace the CLI from parsed arguments to one application operation. Accept a directly bound function or a use-case instance whose `run()` implements the sequence. A notebook or Lambda can invoke the same operation without repeating retrieval, classification or transition steps. |
 | Replaceable input source | The application accepts an alert reference and obtains the text through an injected reader. Substituting an in-memory source requires no CLI parsing, file access or changes to the workflow. |
-| Application policy | The application owns the classification instructions and decision-to-status mapping. It invokes model and ticket-update capabilities supplied by its caller. Substitutes can exercise the workflow without network or credentials. |
+| Core policy | Locate the Markdown classification criteria and the verdict-to-target-status mapping in core. Verify all three mappings there. |
+| Application orchestration | Trace source read, model call, core decision and ticket update in order. Verify the update port receives the issue key and decided target status. The Jira adapter may resolve a transition ID for that status. It must be usable without knowing the alert classification. |
 | External systems | AWS secret retrieval, model invocation and Jira protocol details have distinct owners outside the workflow. Check where credentials are acquired and how concrete dependencies reach the application. |
 | Module boundaries | Invocation, application policy and vendor operations live in distinct modules. Follow the calls to detect mixed responsibilities even when the filenames suggest separation. |
 | Package boundaries | Locate the verdict policy in core, sequencing in application and concrete I/O in adapters. Check what each package actually does. Trace the configured application call and flag wrappers that only construct or forward to another callable. |
-| Prompt resource | The reusable classification instructions live in a dedicated Markdown file. Trace how the application loads that file and passes the text to the model adapter. |
+| Prompt resource | Trace the core-owned Markdown instructions and alert text into the complete semantic request that the application supplies to the model port. |
 | Request ownership | A substitute model receives the complete ordered request, including the distinction between instructions and alert data. The adapter owns provider field names, credentials and transport. |
 | Module names | Compare each single-purpose module's filename to its primary callable or class. Check framework-defined entry points separately. |
 

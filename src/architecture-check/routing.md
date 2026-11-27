@@ -37,6 +37,7 @@ In this ETL example the company has standardized hundreds of pipelines on Spark.
 
 | Responsibility in the patch | Placement rule | Defect ETL example |
 | --- | --- | --- |
+| Decide what a domain outcome means | Keep the decision or lookup with the domain that defines it. The application passes the decided value to the outbound port. | Tenant status mappings belong with the tenant's Silver rules. The Delta writer persists the resulting data. |
 | Define the data and step vocabulary | Keep shared types with the contracts their callers use. | `shared/core/models/table.py` pairs a qualified name with a schema. `pipeline_step.py` describes named inputs, outputs, contracts and a transformation. |
 | Check a data contract | Keep the check beside the contract when the data representation is an accepted core dependency. | `shared/core/schema_validation.py` validates Spark DataFrames directly. |
 | Coordinate operations | Keep ordering in the application runner. | `shared/application/pipeline_runner.py` reads, validates inputs, transforms, validates outputs and writes. |
