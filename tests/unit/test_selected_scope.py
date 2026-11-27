@@ -56,10 +56,12 @@ def test_each_reviewer_receives_only_its_file_type(tmp_path, monkeypatch, filena
                                             tool_input={"command": "*** Begin Patch\n" + sections + "*** End Patch"}))
         reviews.parallel_review(groups)
 
+    code_roles = {"experience", "function-readability", "entry-point-design",
+                  "port-contracts-and-bindings", "package-and-policy-ownership", "correctness"}
     expected = {"guide.MD": {"reader", "representation"},
-                "app.ts": {"experience", "standards", "correctness"},
-                "service.py": {"experience", "standards", "correctness", "module_ordering",
-                               "python-api", "python-function-design", "python-architecture"}}
+                "app.ts": code_roles,
+                "service.py": code_roles | {"module_ordering", "python-api", "python-function-design",
+                                            "python-architecture"}}
     expected["types.pyi"] = expected["service.py"]
     assert set(jobs) == set.union(*(expected[name] for name in filenames))
     for role, evidence in jobs.items():

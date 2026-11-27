@@ -91,7 +91,12 @@ def test_model_inputs_are_limited_to_assigned_edits_and_guidance(tmp_path, monke
     c1 = (reviews.PROMPTS / "parallel-reviewers/representation/use-exact-identifiers-and-concrete-operations.md").read_text()
     assert sum(c1 in prompt for prompt in prompts) == 1
     assert c1.rstrip().endswith("|") and "Apply these **code-explanation rules**" not in c1
-    assert len(prompts) == 5
+    code_guides = [reviews._guidance_for(role) for role in reviews.ROLES["code"]]
+    code_prompts = [prompt for prompt in prompts if "PYTHON_CANARY" in prompt]
+    assert len(code_prompts) == len(code_guides)
+    assert all(sum(guide in prompt for guide in code_guides) == 1 for prompt in code_prompts)
+    assert all(sum(guide in prompt for prompt in code_prompts) == 1 for guide in code_guides)
+    assert len(prompts) == len(code_prompts) + 2
     for prompt in prompts:
         assert boundary in prompt
         assert ("PYTHON_CANARY" in prompt) != ("MARKDOWN_CANARY" in prompt)

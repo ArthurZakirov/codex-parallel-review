@@ -24,7 +24,14 @@ The [placement experiment](tests/system/placement-experiment.md) includes a repe
 
 ## How review works
 
-**Code edits.** Native and observed shell edits go to experience, standards and correctness reviewers.
+**Code edits.** Native and observed shell edits receive experience and correctness reviews plus four independent design reviews.
+
+| Reviewer | What it checks |
+| --- | --- |
+| [Function readability](src/parallel-review/prompts/parallel-reviewers/function-readability.md) | Grouping related statements and naming decisions |
+| [Entry-point design](src/parallel-review/prompts/parallel-reviewers/entry-point-design.md) | Parsing, application invocation, presentation and import-time behavior |
+| [Port contracts and bindings](src/parallel-review/prompts/parallel-reviewers/port-contracts-and-bindings.md) | Consumer-defined capabilities, provider operations and direct adapter injection |
+| [Package and policy ownership](src/parallel-review/prompts/parallel-reviewers/package-and-policy-ownership.md) | Placement of domain decisions and root-level source files |
 
 **Markdown edits.** For shell commands, the hook compares files before and after execution in the tool working directory and literal `cd` destinations. Inside a Git checkout it uses tracked and non-ignored untracked files across the checkout. It also checks explicit file paths in the command. Native patches supply their own edit paths. A new document goes to both reviewers in full. For an existing document, each receives a diff and the enclosing sections. The submission supplies the writing request when available.
 
